@@ -72,9 +72,9 @@ namespace VertexUI {
 	{
 		wchar_t a[128];
 		_itow(i, a, 10);
-			OutputDebugString(a);
-			OutputDebugString(L"\n");
-			return;
+		OutputDebugString(a);
+		OutputDebugString(L"\n");
+		return;
 	}
 	int GetPtInfo2(const vinaPoint& vp, int x, int y, int sizex, int sizey)
 	{
@@ -113,7 +113,7 @@ namespace VertexUI {
 
 			return -1;
 		}
-		virtual int AddEvent(const vinaPoint& pt,vinaEvent _) {
+		virtual int AddEvent(const vinaPoint& pt, vinaEvent _) {
 
 			return -1;
 		}
@@ -174,7 +174,7 @@ namespace VertexUI {
 		}
 		void ResetHoverFlag()
 		{
-			
+
 			this->IsHoverd = false;
 		}
 		void ResetClickFlag()
@@ -343,7 +343,7 @@ namespace VertexUI {
 			}
 			return ret;
 		}
-		virtual int AddEvent(const vinaPoint& pt,vinaEvent event_)
+		virtual int AddEvent(const vinaPoint& pt, vinaEvent event_)
 		{
 			int ret = -1;
 			if (CtlPtr.size() >= 1)
@@ -351,7 +351,7 @@ namespace VertexUI {
 				for (int i = 0; i < CtlPtr.size(); i++)
 				{
 
-					int preret = CtlPtr[i]->AddEvent(pt,event_);
+					int preret = CtlPtr[i]->AddEvent(pt, event_);
 					if (preret != -1)
 					{
 						ret = preret;
@@ -361,7 +361,16 @@ namespace VertexUI {
 			}
 			return ret;
 		}
-		
+		virtual int GetInstantScrollDepth()
+		{
+			int prev = instScrollDepth;
+			instScrollDepth = 0;
+			return prev;
+		}
+		virtual void SetInstantScrollDepth(int i)
+		{
+			instScrollDepth = i;
+		}
 	protected:
 		template <class T>
 		void SetLayout(T ctl) {
@@ -375,7 +384,7 @@ namespace VertexUI {
 
 				int CrLine = ceil((CtlPtr.size()) / count);
 				OutputDebugString(L"CURRENT COUNT:\n");
-				MonitorValue( count);
+				MonitorValue(count);
 				ctl->SetInfo(Layout.x + OneSize * (CtlPtr.size()) - (count * CrLine) * OneSize, y + CrLine * (Layout.uniCy + Layout.interval), Layout.uniCx, Layout.uniCy);
 			}
 			if (Layout.Mode == vinaLayout::Pushing)
@@ -408,7 +417,7 @@ namespace VertexUI {
 		}
 		HWND hWnd;
 		HDC hdc;
-
+		int instScrollDepth = 0;
 		std::vector<VertexUIGroup>Group;
 		std::vector<VertexUIControl>Ctl;
 		std::vector<std::shared_ptr<VertexUIControl>>CtlPtr;
@@ -440,19 +449,19 @@ namespace VertexUI {
 		virtual int AddEvent(const vinaPoint& pt, vinaEvent event_)
 		{
 			int ret = -1;
-			
+
 			if (CtlPtr.size() >= 1)
 			{
 				int iterPos = 0;
-					for (int i = 0; i < CtlPtr.size(); i++)
-					{
-						CtlPtr[i]->ResetHoverFlag();
-						if(event_==vinaEvent::mouseUp || event_ == vinaEvent::mouseUnfocus)CtlPtr[i]->ResetClickFlag();
-					}
-				for (int i = CtlPtr.size()-1; i >= 0; i--)
+				for (int i = 0; i < CtlPtr.size(); i++)
+				{
+					CtlPtr[i]->ResetHoverFlag();
+					if (event_ == vinaEvent::mouseUp || event_ == vinaEvent::mouseUnfocus)CtlPtr[i]->ResetClickFlag();
+				}
+				for (int i = CtlPtr.size() - 1; i >= 0; i--)
 				{
 
-					
+
 					VertexUIPos vp = CtlPtr[i]->GetCurrentRect();
 					if (GetPtInfo2(pt, vp.x, vp.y, vp.cx, vp.cy))
 					{
@@ -464,7 +473,7 @@ namespace VertexUI {
 						}
 					}
 					iterPos++;
-					
+
 				}
 			}
 
@@ -493,7 +502,7 @@ namespace VertexUI {
 		void Add(T ctl)
 		{
 			SetLayout(ctl);
-			ctl->CreateInheritedCtl(hWnd, pDC,ctl);
+			ctl->CreateInheritedCtl(hWnd, pDC, ctl);
 			ctl->SetParent(this);
 			this->CtlPtr.push_back(ctl);
 		}

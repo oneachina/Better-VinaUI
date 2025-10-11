@@ -243,6 +243,110 @@ namespace VertexUI
 		{
 			return GetRValue(OriClr) << 16 | GetGValue(OriClr) << 8 | GetBValue(OriClr);
 		}
+
+
+		template<class T>
+		void D2DDrawCircleArc(T* m_pDCRT, float x, float y, float rad, unsigned long arcClr, float animated, float strokeWidth = 2.0f, float alpha = 1.0f)
+		{
+			int hr = 0;
+			ID2D1SolidColorBrush* arcBrush = NULL;
+			hr = m_pDCRT->CreateSolidColorBrush(
+				D2D1::ColorF(D2D1::ColorF(RGBToHex(arcClr), alpha)),
+				&arcBrush
+			);
+
+			if (SUCCEEDED(hr))
+			{
+				// 创建笔刷样式
+				ID2D1StrokeStyle* strokeStyle = NULL;
+				D2D1_STROKE_STYLE_PROPERTIES strokeProperties = D2D1::StrokeStyleProperties(
+					D2D1_CAP_STYLE_ROUND,
+					D2D1_CAP_STYLE_ROUND,
+					D2D1_CAP_STYLE_ROUND
+				);
+
+				hr = m_pD2DFactory->CreateStrokeStyle(strokeProperties, NULL, 0, &strokeStyle);
+
+				if (SUCCEEDED(hr))
+				{
+					float sweepAngle = 0;
+					float startAngle = -3.141592653f / 2.0f; // 从顶部开始
+
+					// 处理动画逻辑：0-100正向显示，100-200反向消失
+					if (animated <= 100)
+					{
+						// 0-100: 正向显示
+						sweepAngle = (animated / 100.0f) * 2.0f * 3.141592653f;
+					}
+					else if (animated <= 200)
+					{
+						// 100-200: 反向消失（从完整圆开始，逐渐减少）
+						float progress = (animated - 100.0f) / 100.0f; // 0-1
+						sweepAngle = (1.0f - progress) * 2.0f * 3.141592653f;
+						startAngle = startAngle + progress * 2.0f * 3.141592653f; // 起始点移动
+					}
+					else
+					{
+						// 超过200时不显示
+						SafeRelease(&strokeStyle);
+						SafeRelease(&arcBrush);
+						return;
+					}
+
+					// 如果角度太小，不绘制
+					if (sweepAngle < 0.01f)
+					{
+						SafeRelease(&strokeStyle);
+						SafeRelease(&arcBrush);
+						return;
+					}
+
+					// 创建路径几何
+					ID2D1PathGeometry* pathGeometry = NULL;
+					hr = m_pD2DFactory->CreatePathGeometry(&pathGeometry);
+
+					if (SUCCEEDED(hr))
+					{
+						ID2D1GeometrySink* sink = NULL;
+						hr = pathGeometry->Open(&sink);
+
+						if (SUCCEEDED(hr))
+						{
+							// 起始点
+							D2D1_POINT_2F startPoint;
+							startPoint.x = x + rad * cos(startAngle);
+							startPoint.y = y + rad * sin(startAngle);
+
+							sink->BeginFigure(startPoint, D2D1_FIGURE_BEGIN_FILLED);
+
+							D2D1_ARC_SEGMENT arcSegment;
+							arcSegment.point.x = x + rad * cos(startAngle + sweepAngle);
+							arcSegment.point.y = y + rad * sin(startAngle + sweepAngle);
+							arcSegment.size.width = rad;
+							arcSegment.size.height = rad;
+							arcSegment.rotationAngle = 0.0f;
+							arcSegment.sweepDirection = D2D1_SWEEP_DIRECTION_CLOCKWISE;
+							arcSegment.arcSize = (sweepAngle > 3.141592653f) ? D2D1_ARC_SIZE_LARGE : D2D1_ARC_SIZE_SMALL;
+
+							sink->AddArc(&arcSegment);
+							sink->EndFigure(D2D1_FIGURE_END_OPEN);
+							sink->Close();
+
+							m_pDCRT->DrawGeometry(pathGeometry, arcBrush, strokeWidth, strokeStyle);
+
+							SafeRelease(&sink);
+						}
+
+						SafeRelease(&pathGeometry);
+					}
+
+					SafeRelease(&strokeStyle);
+				}
+
+				SafeRelease(&arcBrush);
+			}
+		}
+
 		template<class T>
 		void D2DDrawRoundRect(T* m_pDCRT, float x, float y, float cx, float cy, unsigned long ClrFill, float radius, float alpha = 1, float border = 0, unsigned long borderColor = 0, float borderAlphaSpecial = 0, bool OnlyBorder = false)
 		{
@@ -366,8 +470,39 @@ namespace VertexUI
 			m_pGDIRT->ReleaseDC(NULL);
 			SafeRelease(&m_pGDIRT);
 		}
+		typedef void (D2DHWNDDRAWLAYERPANEL)(HWND, ID2D1HwndRenderTarget*, int x, int y, int cx, int cy);
+		template <class T>
+		void D2DDrawInClippedRoundRect(HWND hWnd, T pRT, float x, float y, float cx, float cy, float rr, std::function<D2DHWNDDRAWLAYERPANEL> dwf)
+		{
+			HRESULT hr = S_OK;
+
+			// Create a layer.
+			ID2D1Layer* pLayer = NULL;
+			hr = pRT->CreateLayer(NULL, &pLayer);
+			D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(
+				D2D1::RectF(x, y, cx + x, cy + y),
+				rr, rr
+			);
+			ID2D1RoundedRectangleGeometry* pathGeo;
+			m_pD2DFactory->CreateRoundedRectangleGeometry(roundedRect, &pathGeo);
+			if (SUCCEEDED(hr))
+			{
+				pRT->PushLayer(
+					D2D1::LayerParameters(D2D1::InfiniteRect(), pathGeo, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE),
+					pLayer
+				);
+
+				dwf(hWnd, pRT, x, y, cx, cy);
+				pRT->PopLayer();
+
+			}
+			SafeRelease(&pathGeo);
+			SafeRelease(&pLayer);
+
+			return;
+		}
 		template<class T>
-		void D2DDrawText(T pRenderTarget, const wchar_t* Text, int x, int y, int cx, int cy, float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE, const wchar_t* font = L"Segoe UI", float alpha = 1, DWRITE_FONT_WEIGHT wid = DWRITE_FONT_WEIGHT_NORMAL)
+		void D2DDrawText(T pRenderTarget, const wchar_t* Text, float x, float y, int cx, int cy, float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE, const wchar_t* font = L"Segoe UI", float alpha = 1, DWRITE_FONT_WEIGHT wid = DWRITE_FONT_WEIGHT_NORMAL)
 		{
 			IDWriteTextFormat* pTextFormat = NULL;
 			ID2D1SolidColorBrush* testBrush = NULL;
@@ -434,6 +569,40 @@ namespace VertexUI
 			SafeRelease(&pTextFormat);
 			SafeRelease(&testBrush);
 		}
+		template<class T>
+		void D2DDrawText3(T pRenderTarget, const wchar_t* Text, float x, float y, float cx, float cy, float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE, const wchar_t* font = L"Segoe UI", float alpha = 1, bool center = false)
+		{
+			IDWriteTextFormat* pTextFormat = NULL;
+			ID2D1SolidColorBrush* testBrush = NULL;
+			pRenderTarget->CreateSolidColorBrush(
+				D2D1::ColorF(D2D1::ColorF(RGBToHex(ClrFill), alpha)),
+				&testBrush
+			);
+			//create text format
+			pDWriteFactory->CreateTextFormat(
+				font,
+				NULL,
+				DWRITE_FONT_WEIGHT_SEMI_BOLD,
+				DWRITE_FONT_STYLE_NORMAL,
+				DWRITE_FONT_STRETCH_NORMAL,
+				Size,
+				L"",
+				&pTextFormat
+			);
+			if (center == true)pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+			D2D1_RECT_F layoutRect = D2D1::RectF(x, y, x + cx, y + cy);
+
+			//draw text
+			pRenderTarget->DrawText(
+				Text,
+				wcslen(Text),
+				pTextFormat,
+				layoutRect,
+				testBrush
+			);
+			SafeRelease(&pTextFormat);
+			SafeRelease(&testBrush);
+		}
 		void CompD2DDrawRoundRect(HWND hWnd, HDC hdc, int x, int y, int cx, int cy, unsigned long ClrFill, int radius, float alpha = 1, int border = 0, unsigned long borderColor = 0, float borderAlphaSpecial = 0, bool OnlyBorder = false)
 		{
 			// Create a DC render target.
@@ -475,7 +644,7 @@ namespace VertexUI
 			ID2D1HwndRenderTarget* pRT = NULL;
 
 			// Create a Direct2D render target          
-			if (pRT == NULL && pRts[hWnd]==nullptr)
+			if (pRT == NULL && pRts[hWnd] == nullptr)
 			{
 				D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
 				rtProps.usage = D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE;
@@ -799,6 +968,27 @@ namespace VertexUI
 			return hico;
 
 		}
+
+		HICON GetFileIcon3(const wchar_t* pszPath)
+		{
+			SHFILEINFO sfi;
+			if (!SHGetFileInfo(pszPath, 0, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX)) return NULL;
+
+			// 获取大号图像列表
+			IImageList* piml;
+
+			if (FAILED(SHGetImageList(SHIL_JUMBO, IID_PPV_ARGS(&piml)))) return NULL;
+
+			// 提取图标
+			HICON hico;
+			piml->GetIcon(sfi.iIcon, ILD_TRANSPARENT, &hico);
+
+			// 清理资源
+			piml->Release();
+
+			return hico;
+
+		}
 		void DisplayIcon(HDC hdc, const wchar_t* path, int x, int y, int sz)
 		{
 			//正式代码
@@ -810,52 +1000,7 @@ namespace VertexUI
 				DrawIconEx(hdc, x, y, hIcon, sz, sz, 0, NULL, DI_NORMAL);
 			DestroyIcon(hIcon);
 		}
-		template <typename T>
-		void D2DDisplayIcon(T hdc, const wchar_t* path, int x, int y, int sz)
-		{
-			ID2D1Bitmap* pBitmap = NULL;
-			if (std::wstring(path) == L"NULL" || std::wstring(path) == L"" || std::wstring(path) == L" ")
-				return;
 
-			HICON hIcon = GetFileIcon(path, 1);
-			if (!hIcon) return;
-
-			ICONINFO iconInfo;
-			GetIconInfo(hIcon, &iconInfo);
-
-			// 获取图标的位图信息
-			BITMAP bm;
-			GetObject(iconInfo.hbmColor, sizeof(BITMAP), &bm);
-
-			// 创建一个 D2D 位图
-			D2D1_SIZE_U size = D2D1::SizeU(bm.bmWidth, bm.bmHeight);
-			D2D1_BITMAP_PROPERTIES bitmapProps = D2D1::BitmapProperties(
-				D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED));
-
-			BYTE* pPixels = new BYTE[bm.bmWidthBytes * bm.bmHeight];
-			GetBitmapBits(iconInfo.hbmColor, bm.bmWidthBytes * bm.bmHeight, pPixels);
-
-			ID2D1Bitmap* d2dBitmap = nullptr;
-			hdc->CreateBitmap(size, pPixels, bm.bmWidthBytes, bitmapProps, &d2dBitmap);
-
-
-
-			// 绘制 D2D 位图
-			hdc->DrawBitmap(d2dBitmap, D2D1::RectF(x, y, x + sz, y + sz));
-
-			// 结束绘制
-			HRESULT hr = hdc->EndDraw();
-			if (FAILED(hr))
-			{
-				OutputDebugString(L"Failed to render icon.");
-			}
-
-			// 清理
-			delete[] pPixels;
-			d2dBitmap->Release();
-			DeleteObject(iconInfo.hbmColor);
-			DeleteObject(iconInfo.hbmMask);
-		}
 		ID2D1Bitmap* CreateIconBitmap(ID2D1RenderTarget* pRenderTarget, const wchar_t* path, int sz)
 		{
 			if (!pRenderTarget) return nullptr;
@@ -904,6 +1049,62 @@ namespace VertexUI
 
 			// 清理
 			DeleteObject(hBitmap);
+			DeleteDC(hdcMem);
+			ReleaseDC(nullptr, hdcScreen);
+
+			return pD2DBitmap;
+		}
+		template <typename T>
+		ID2D1Bitmap* D2DCreateIconBitmap(T* pRenderTarget, const wchar_t* path, int sz)
+		{
+			if (!pRenderTarget) return nullptr;
+
+			// 获取HICON
+
+			HICON hIcon;
+			if (sz > 128)
+			{
+				hIcon = GetFileIcon3(path);
+			}
+			else  hIcon = GetFileIcon2(path);
+			if (!hIcon) return nullptr;
+
+			// 创建32位DIB
+			HDC hdcScreen = GetDC(nullptr);
+			HDC hdcMem = CreateCompatibleDC(hdcScreen);
+
+			BITMAPINFO bmi = { 0 };
+			bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+			bmi.bmiHeader.biWidth = sz;
+			bmi.bmiHeader.biHeight = -sz;
+			bmi.bmiHeader.biPlanes = 1;
+			bmi.bmiHeader.biBitCount = 32;
+			bmi.bmiHeader.biCompression = BI_RGB;
+
+			BYTE* pBits = nullptr;
+			HBITMAP hBitmap = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, (void**)&pBits, nullptr, 0);
+
+			HGDIOBJ hOld = SelectObject(hdcMem, hBitmap);
+			DrawIconEx(hdcMem, 0, 0, hIcon, sz, sz, 0, nullptr, DI_NORMAL);
+			SelectObject(hdcMem, hOld);
+
+			// 创建D2D位图
+			D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties(
+				D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
+			);
+
+			ID2D1Bitmap* pD2DBitmap = nullptr;
+			HRESULT hr = pRenderTarget->CreateBitmap(
+				D2D1::SizeU(sz, sz),
+				pBits,
+				sz * 4,
+				&props,
+				&pD2DBitmap
+			);
+
+			// 清理
+			DeleteObject(hBitmap);
+			DestroyIcon(hIcon);
 			DeleteDC(hdcMem);
 			ReleaseDC(nullptr, hdcScreen);
 
@@ -1018,6 +1219,38 @@ namespace VertexUI
 
 			// 清理
 			d2dBitmap->Release();
+		}
+		template <typename T>
+		void D2DDrawBitmapFromByte2(T hdc, BYTE* pPixels, int x, int y, int w, int h, int sc)
+		{
+			int bp = gByteWidth;
+
+			// 创建一个 D2D 位图
+			D2D1_SIZE_U size = D2D1::SizeU(w / sc, h / sc);
+			D2D1_BITMAP_PROPERTIES bitmapProps = D2D1::BitmapProperties(
+				D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED));
+
+
+			ID2D1Bitmap* d2dBitmap = nullptr;
+			hdc->CreateBitmap(size, pPixels, bp, bitmapProps, &d2dBitmap);
+
+
+
+			// 绘制 D2D 位图
+
+			hdc->DrawBitmap(d2dBitmap, D2D1::RectF(x, y, x + w, y + h), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, D2D1::RectF(0, 0, w / sc, h / sc));
+
+			// 结束绘制
+
+			// 清理
+			d2dBitmap->Release();
+		}
+		template <typename T>
+		void D2DDisplayIcon(T hdc, const wchar_t* path, int x, int y, int sz)
+		{
+			ID2D1Bitmap* BMP = D2DCreateIconBitmap(hdc, path, sz);
+			D2DDrawBitmapFrompBm(hdc, BMP, x, y, sz);
+			SafeRelease(&BMP);
 		}
 		void CreatehIcon(HDC hdc, HICON hIcon, int x, int y, int sz)
 		{
@@ -1553,6 +1786,51 @@ namespace VertexUI::Panel
 		return c / 2 * ((t -= 2) * t * t + 2) + b;
 
 	}
+	double CalcBezierCurve(double t, double b, double c, double d,
+		double p1x, double p1y, double p2x, double p2y) {
+
+		if (d <= 0) return c;
+		if (t <= 0) return b;
+		if (t >= d) return c;
+
+
+		double normalizedT = t / d;
+
+		double uMin = 0.0;
+		double uMax = 1.0;
+		double u = 0.5;
+		const int iterations = 20;
+
+		for (int i = 0; i < iterations; ++i) {
+			u = (uMin + uMax) / 2.0;
+
+			double oneMinusU = 1.0 - u;
+			double uSq = u * u;
+			double oneMinusUSq = oneMinusU * oneMinusU;
+
+			double x = 3.0 * oneMinusUSq * u * p1x +
+				3.0 * oneMinusU * uSq * p2x +
+				uSq * u;
+
+			if (x < normalizedT) {
+				uMin = u;
+			}
+			else {
+				uMax = u;
+			}
+		}
+
+
+		double oneMinusU = 1.0 - u;
+		double uSq = u * u;
+		double oneMinusUSq = oneMinusU * oneMinusU;
+
+		double y = 3.0 * oneMinusUSq * u * p1y +
+			3.0 * oneMinusU * uSq * p2y +
+			uSq * u;
+
+		return b + y * (c - b);
+	}
 	double CalcBounceCurve(double t, double b, double c, double d)
 	{
 		t /= d;
@@ -2058,6 +2336,56 @@ namespace VertexUI::Panel
 		_SAFE_DELETE(nBits);
 		//delete[]pBits;
 		return hBitMap;
+	}
+	BYTE* _D2DGaussianBlurFunc(HDC hDC, int x, int y, int iWidth, int iHeight, double s = 3.5, bool IsLowQuality = false, int lqNum = 8, bool lqButhq = false, bool MultiThread = true)
+	{
+		if (IsLowQuality == false)lqNum = 1;
+		iWidth /= lqNum; iHeight /= lqNum;
+		static HBITMAP hBitMap;
+		DeleteObject(hBitMap);
+		HDC hMemDC = CreateCompatibleDC(hDC);
+		hBitMap = CreateCompatibleBitmap(hDC, iWidth, iHeight); // 创建与设备描述表兼容的位图
+		HBITMAP hPreBmp = (HBITMAP)SelectObject(hMemDC, hBitMap);
+		if (IsLowQuality == true) {
+			if (lqButhq == true)
+			{
+				::SetStretchBltMode(hMemDC, HALFTONE);
+				::SetBrushOrgEx(hMemDC, 0, 0, NULL);
+			}StretchBlt(hMemDC, 0, 0, iWidth, iHeight, hDC, x, y, iWidth * lqNum, iHeight * lqNum, SRCCOPY);
+		}
+		else BitBlt(hMemDC, 0, 0, iWidth, iHeight, hDC, x, y, SRCCOPY);
+		int size = iWidth * iHeight * 4;
+		clock_t time = clock();
+		unsigned char* pBits = (unsigned char*)malloc(size);  //在堆上申请
+
+		int nBytes = GetBitmapBits(hBitMap, size, pBits);
+
+
+		unsigned char* nBits = (unsigned char*)malloc(size);  //在堆上申请
+		CGaussBlurFilter<double> _filter;
+		_filter.SetSigma(s); // 设置高斯半径
+		if (MultiThread != false)_filter.SetMultiThreads(true, 4);
+		_filter.Filter(pBits, nBits, iWidth, iHeight, 32);
+		SetBitmapBits(hBitMap, size, nBits);
+
+
+		clock_t etime = clock();
+		int ntime = etime - time;
+		//SetBitmapBits(hBitMap, size, pBits);
+
+		wchar_t timec[20];
+		_itow(ntime, timec, 10);
+		OutputDebugString(L"Blur Time:");
+		OutputDebugString(timec);
+		OutputDebugString(L"\n");
+		//SelectObject(hdcMem, hOld);
+		SelectObject(hMemDC, hPreBmp);
+		DeleteObject(hMemDC);
+
+		//_SAFE_DELETE(pBits);
+		//_SAFE_DELETE(nBits);
+		//delete[]pBits;
+		return  pBits;
 	}
 	//防止Bmp冲突（（
 	HBITMAP _GaussianBlurFunc2(HDC hDC, int x, int y, int iWidth, int iHeight, int s = 3.5, bool IsLowQuality = false, int lqNum = 8, bool lqButhq = false, bool MultiThread = true)
