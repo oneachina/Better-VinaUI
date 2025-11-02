@@ -138,9 +138,6 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainUI.hpp" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="VertexUI.Window.OuterShadow.hpp" />
-    <ClInclude Include="VertexUI.Window.SimpleShadow.hpp" />
-    <ClInclude Include="VertexUI.Window.Utils.hpp" />
     <ClInclude Include="VertexUI\framework.h" />
     <ClInclude Include="VertexUI\VertexUI.Animation.hpp" />
     <ClInclude Include="VertexUI\VertexUI.ClickArea.h" />
@@ -148,9 +145,12 @@
     <ClInclude Include="VertexUI\VertexUI.Control.hpp" />
     <ClInclude Include="VertexUI\VertexUI.min.h" />
     <ClInclude Include="VertexUI\VertexUI.Panel.h" />
-    <ClInclude Include="VertexUI\VertexUI.Window.hpp" />
     <ClInclude Include="VertexUI\vui.parser\vui.parser.basic.hpp" />
     <ClInclude Include="VertexUI\vui.parser\vui.parser.hpp" />
+    <ClInclude Include="VertexUI\window\VertexUI.Window.hpp" />
+    <ClInclude Include="VertexUI\window\VertexUI.Window.OuterShadow.hpp" />
+    <ClInclude Include="VertexUI\window\VertexUI.Window.SimpleShadow.hpp" />
+    <ClInclude Include="VertexUI\window\VertexUI.Window.Utils.hpp" />
     <ClInclude Include="VinaApp.h" />
     <ClInclude Include="VinaAppTool.h" />
     <ClInclude Include="VinaCommonCtls.hpp" />

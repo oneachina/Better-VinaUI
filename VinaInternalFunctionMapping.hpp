@@ -1,6 +1,6 @@
 #pragma once
 #include "VertexUI/VertexUI.min.h"
-#include "VertexUI/VertexUI.Window.hpp"
+#include "VertexUI/window/VertexUI.Window.hpp"
 #include "VertexUI/VertexUI.Control.hpp"
 #include <any>
 

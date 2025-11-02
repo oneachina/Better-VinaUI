@@ -16,8 +16,8 @@
     <Filter Include="头文件\Base">
       <UniqueIdentifier>{8022689c-1929-4871-8e10-707ed633c790}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\VertexUI.Window">
-      <UniqueIdentifier>{2042ac73-669c-46ab-8bbf-a5e149be8e76}</UniqueIdentifier>
+    <Filter Include="头文件\Vina.window">
+      <UniqueIdentifier>{e8a28f5f-1728-4675-be1c-b20a36bd409a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -75,17 +75,17 @@
     <ClInclude Include="VinaAppTool.h">
       <Filter>头文件\Base</Filter>
     </ClInclude>
-    <ClInclude Include="VertexUI.Window.OuterShadow.hpp">
-      <Filter>头文件\VertexUI.Window</Filter>
+    <ClInclude Include="VertexUI\window\VertexUI.Window.hpp">
+      <Filter>头文件\Vina.window</Filter>
     </ClInclude>
-    <ClInclude Include="VertexUI.Window.SimpleShadow.hpp">
-      <Filter>头文件\VertexUI.Window</Filter>
+    <ClInclude Include="VertexUI\window\VertexUI.Window.OuterShadow.hpp">
+      <Filter>头文件\Vina.window</Filter>
     </ClInclude>
-    <ClInclude Include="VertexUI\VertexUI.Window.hpp">
-      <Filter>头文件\VertexUI.Window</Filter>
+    <ClInclude Include="VertexUI\window\VertexUI.Window.SimpleShadow.hpp">
+      <Filter>头文件\Vina.window</Filter>
     </ClInclude>
-    <ClInclude Include="VertexUI.Window.Utils.hpp">
-      <Filter>头文件\VertexUI.Window</Filter>
+    <ClInclude Include="VertexUI\window\VertexUI.Window.Utils.hpp">
+      <Filter>头文件\Vina.window</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

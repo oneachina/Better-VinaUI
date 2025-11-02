@@ -6,8 +6,8 @@
 #include <unordered_map>
 
 // VertexUI 核心模块
-#include "VertexUI.min.h"
-#include "../LightFrame.WindowAnimation.h"
+#include "../VertexUI.min.h"
+#include "../../LightFrame.WindowAnimation.h"
 
 // 窗口组件模块
 #include "VertexUI.Window.Utils.hpp"
