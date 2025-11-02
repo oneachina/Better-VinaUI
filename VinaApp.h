@@ -2,7 +2,6 @@
 
 #include "resource.h"
 
-
 wchar_t LocalAppData[MAX_PATH] = L""; //Tag"\\"
 wchar_t LocalData[MAX_PATH] = L""; //Tag"\\"
 char LocalLFDataA[MAX_PATH] = ""; //Tag"\\"
@@ -19,4 +18,3 @@ wchar_t LocalRes[MAX_PATH] = L""; //Tag"\\"
 wchar_t LocalCom[MAX_PATH] = L"";
 wchar_t LocalCards[MAX_PATH] = L"";
 char LocalComA[MAX_PATH] = "";
-

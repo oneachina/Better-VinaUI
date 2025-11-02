@@ -7,6 +7,7 @@
 *
 */
 #pragma comment(lib,"Msimg32.lib")
+#pragma warning(disable : 4244)
 #include "framework.h"
 #include "VertexUI.Colors.h"
 #include <Shlwapi.h>
