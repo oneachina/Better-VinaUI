@@ -1,4 +1,6 @@
 #pragma once
+#pragma warning(disable:4267)
+
 #include "framework.h"
 #include <vector>
 namespace VertexUI {

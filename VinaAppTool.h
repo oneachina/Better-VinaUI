@@ -1,6 +1,8 @@
 #pragma once
 #include <ShlObj.h>
 #include <iostream>
+
+#pragma warning(disable : 4267)
 #pragma warning(disable : 4996)
 #pragma warning(disable : 6031)
 

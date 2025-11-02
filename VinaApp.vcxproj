@@ -145,6 +145,10 @@
     <ClInclude Include="VertexUI\VertexUI.Control.hpp" />
     <ClInclude Include="VertexUI\VertexUI.min.h" />
     <ClInclude Include="VertexUI\VertexUI.Panel.h" />
+    <ClInclude Include="VertexUI\VinaCommonCtls.hpp" />
+    <ClInclude Include="VertexUI\VinaComponents.hpp" />
+    <ClInclude Include="VertexUI\VinaInternalFunctionMapping.hpp" />
+    <ClInclude Include="VertexUI\VinaWindow.hpp" />
     <ClInclude Include="VertexUI\vui.parser\vui.parser.basic.hpp" />
     <ClInclude Include="VertexUI\vui.parser\vui.parser.hpp" />
     <ClInclude Include="VertexUI\window\VertexUI.Window.hpp" />
@@ -153,10 +157,6 @@
     <ClInclude Include="VertexUI\window\VertexUI.Window.Utils.hpp" />
     <ClInclude Include="VinaApp.h" />
     <ClInclude Include="VinaAppTool.h" />
-    <ClInclude Include="VinaCommonCtls.hpp" />
-    <ClInclude Include="VinaComponents.hpp" />
-    <ClInclude Include="VinaInternalFunctionMapping.hpp" />
-    <ClInclude Include="VinaWindow.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VertexUI\vui.parser\main.cpp" />
@@ -166,11 +166,8 @@
     <ResourceCompile Include="VinaApp.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="small.ico" />
-    <Image Include="VinaApp.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="VertexUI\VertexUI" />
+    <Image Include="icon\small.ico" />
+    <Image Include="icon\VinaApp.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

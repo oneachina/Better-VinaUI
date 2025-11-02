@@ -1,6 +1,10 @@
 ﻿#pragma once
 #include <variant>
 #include "VinaInternalFunctionMapping.hpp"
+#include "../VertexUI/VertexUI.ClickArea.h"
+#include "../VertexUI/window/VertexUI.Window.hpp"
+#include "../VertexUI/VinaComponents.hpp"
+#include <iostream>
 using namespace VertexUI::Click;
 
 

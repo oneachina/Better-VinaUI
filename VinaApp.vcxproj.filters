@@ -13,67 +13,28 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="头文件\Base">
-      <UniqueIdentifier>{8022689c-1929-4871-8e10-707ed633c790}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\Vina.window">
       <UniqueIdentifier>{e8a28f5f-1728-4675-be1c-b20a36bd409a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\VertexUI">
+      <UniqueIdentifier>{681de62d-302c-4a00-b478-86d16f4f08a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\VuiParser">
+      <UniqueIdentifier>{38d97137-1004-4536-9d29-bd1c99bd27a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\VinaApp">
+      <UniqueIdentifier>{8022689c-1929-4871-8e10-707ed633c790}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
     <ClInclude Include="VinaApp.h">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexUI\vui.parser\vui.parser.basic.hpp">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexUI\vui.parser\vui.parser.hpp">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexUI\framework.h">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexUI\VertexUI.Animation.hpp">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexUI\VertexUI.ClickArea.h">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexUI\VertexUI.Colors.h">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexUI\VertexUI.Control.hpp">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexUI\VertexUI.min.h">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexUI\VertexUI.Panel.h">
-      <Filter>头文件\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="VinaCommonCtls.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="VinaComponents.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="VinaInternalFunctionMapping.hpp">
-      <Filter>头文件\Base</Filter>
+      <Filter>头文件\VinaApp</Filter>
     </ClInclude>
     <ClInclude Include="MainUI.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="VinaWindow.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="VinaAppTool.h">
-      <Filter>头文件\Base</Filter>
+      <Filter>头文件\VinaApp</Filter>
     </ClInclude>
     <ClInclude Include="VertexUI\window\VertexUI.Window.hpp">
       <Filter>头文件\Vina.window</Filter>
@@ -87,13 +48,58 @@
     <ClInclude Include="VertexUI\window\VertexUI.Window.Utils.hpp">
       <Filter>头文件\Vina.window</Filter>
     </ClInclude>
+    <ClInclude Include="VertexUI\VinaCommonCtls.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\VinaComponents.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\VinaWindow.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\VertexUI.Animation.hpp">
+      <Filter>头文件\VertexUI</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\VertexUI.ClickArea.h">
+      <Filter>头文件\VertexUI</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\VertexUI.Colors.h">
+      <Filter>头文件\VertexUI</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\VertexUI.Control.hpp">
+      <Filter>头文件\VertexUI</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\VertexUI.min.h">
+      <Filter>头文件\VertexUI</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\VertexUI.Panel.h">
+      <Filter>头文件\VertexUI</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\framework.h">
+      <Filter>头文件\VertexUI</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\vui.parser\vui.parser.hpp">
+      <Filter>头文件\VuiParser</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\vui.parser\vui.parser.basic.hpp">
+      <Filter>头文件\VuiParser</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>资源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexUI\VinaInternalFunctionMapping.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VinaApp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="VertexUI\vui.parser\main.cpp">
-      <Filter>头文件\Base</Filter>
+      <Filter>头文件\VuiParser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -102,16 +108,11 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="small.ico">
+    <Image Include="icon\small.ico">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="VinaApp.ico">
+    <Image Include="icon\VinaApp.ico">
       <Filter>资源文件</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="VertexUI\VertexUI">
-      <Filter>头文件\Base</Filter>
-    </None>
   </ItemGroup>
 </Project>

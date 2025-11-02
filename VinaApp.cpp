@@ -5,7 +5,7 @@
 #include "VertexUI/VertexUI.Panel.h"
 #include "VertexUI/VertexUI.min.h"
 #include "MainUI.hpp"
-#include "VinaWindow.hpp"
+#include "VertexUI/VinaWindow.hpp"
 
 #include <Psapi.h>
 #include <direct.h>
@@ -56,7 +56,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     AddFontResource(fntBase.c_str());
 
 
-    MainWindow->Set(100, 100, 720 * gScale, 480 * gScale, L"VinaClock.main", L"Vilinko VinaUI");
+    MainWindow->Set(100, 100, 720 * gScale, 480 * gScale, L"VinaClock.main.ug", L"Vilinko VinaUI");
     MainWindow->CreatePanel([](HWND hWnd, ID2D1HwndRenderTarget* hrt)->void {
 
 
