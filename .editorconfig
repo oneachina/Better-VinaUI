@@ -1,0 +1,21 @@
+root = true
+
+[*]
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{h,hpp,c,cc,cpp,cxx,inl,ipp,cmake,md,txt,yml,yaml,json}]
+charset = utf-8
+
+[CMakeLists.txt]
+charset = utf-8
+
+[.gitignore]
+charset = utf-8
+
+[.gitattributes]
+charset = utf-8
+
+[*.{rc,rc2}]
+charset = utf-16le
