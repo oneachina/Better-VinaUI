@@ -10,6 +10,44 @@
 - **动画接口**：仅需一行代码即可调用基于 Bezier 曲线的并行、高性能动画。
 - **DPI 自适应**：原生支持屏幕缩放，解决高分屏模糊问题。
 
+## 🧱 项目结构（重构后）
+
+```text
+Better-VinaUI/
+├─ apps/
+│  └─ vina-demo/
+│     ├─ src/                 # 示例应用入口
+│     └─ resources/           # rc / resource.h
+├─ framework/
+│  ├─ Vina/                   # Vina 封装层（窗口、控件、事件）
+│  └─ VertexUI/               # 底层绘制与基础能力
+├─ third_party/
+│  └─ tsl/                    # 第三方容器库
+├─ assets/
+│  ├─ icons/
+│  └─ fonts/
+└─ CMakeLists.txt
+```
+
+## 🔧 构建方式（CMake）
+
+仅保留 CMake 构建流程，不再依赖 Visual Studio `.sln/.vcxproj`。
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+```
+
+默认生成目标：
+- `vina_demo`：主界面示例（Win32 GUI）。
+
+可选目标（默认关闭）：
+
+```bash
+cmake -S . -B build -DBUILD_VUI_PARSER_CLI=ON
+cmake --build build --config Release
+```
+
 ## ✏️ 快速入门
 
 ### 1. 创建主窗口

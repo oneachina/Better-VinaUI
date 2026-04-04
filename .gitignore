@@ -367,3 +367,5 @@ FodyWeavers.xsd
 *.filters
 *.user
 Font-AwesomeFree.ttf
+build/
+CMakeUserPresets.json
