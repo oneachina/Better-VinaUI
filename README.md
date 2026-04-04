@@ -53,7 +53,7 @@ cmake --build build --config Release
 
 ### 1. Create Main Window
 
-```cpp
+```C++
 #include <VinaWindow.hpp>
 
 std::shared_ptr<VinaWindow> MainWindow = std::make_shared<VinaWindow>();
@@ -126,3 +126,4 @@ MainWindow->AnimateVariableWithBezier(
 - @Haceau-Zoac (vui.parser)
 - @KitraMGP (spec suggestions)
 - Thanks to all VinaUI contributors.
+
