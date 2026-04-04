@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <variant>
 #include <random>
 #include <filesystem>
@@ -2286,6 +2286,7 @@ public:
 		if (from == std::wstring(L"win-extend"))return std::wstring(L"\u2304");
 		if (from == std::wstring(L"test-refresh"))return std::wstring(L"\uf0E2");
 		if (from == std::wstring(L"test-plus"))return std::wstring(L"\uf067");
+		return from;
 	}
 	void Set(int x, int y, const wchar_t* txt, int TxtSize = 15, unsigned long TxtColor = VERTEXUICOLOR_WHITE, std::function<void()>events = [] {})
 	{
@@ -2789,7 +2790,7 @@ public:
 
 		D2DDrawRoundRect(hdc, x, y, cx, cy, VuiFadeColor(VERTEXUICOLOR_MIDNIGHT, 10), 12, 1, 2, VERTEXUICOLOR_MIDNIGHTPLUS);
 		D2DDrawInClippedRoundRect(hWnd, hdc, x, y, cx, cy, 12,
-			[this, dist, height](HWND hWnd, HRT hdc2, int x, int y, int cx, int cy)->void {
+			[this, dist, height](HWND hWnd, HRT hdc2, float x, float y, float cx, float cy)->void {
 				D2DDrawText(hdc2, this->txt.c_str(), x + 20, y + 20 - GetMinValue(ScrollDepth, 1), cx + 240, cy + 240, this->txtsz, VERTEXUICOLOR_WHITE);
 				D2DDrawRoundRect(hdc2, x + cx - 6, y + dist, 5, height, VuiFadeColor(VERTEXUICOLOR_MIDNIGHT, 40), 4, 1, 0, VERTEXUICOLOR_MIDNIGHTPLUS);
 			}

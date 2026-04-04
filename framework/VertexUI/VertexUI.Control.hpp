@@ -42,7 +42,7 @@ namespace VertexUI {
 		COLORREF BkColor = VERTEXUICOLOR_SEA;
 		COLORREF TxtColor = VERTEXUICOLOR_WHITE;
 		COLORREF HoverColor = VERTEXUICOLOR_DEEPSEA;
-		int BtnHoverMode = 0; //0:µ×²¿ÑÕÉ« | 1:ÕûÌåÑÕÉ« | 2:ÕûÌå½¥±ä
+		int BtnHoverMode = 0; //0:ï¿½×²ï¿½ï¿½ï¿½É« | 1:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É« | 2:ï¿½ï¿½ï¿½å½¥ï¿½ï¿½
 		VertexUIColorGradientInfo Gradient = { 0,0,0 };
 		int TxtSize = 18;
 		int Corner = 8;
@@ -62,18 +62,18 @@ namespace VertexUI {
 	};
 	struct VinaOption {
 		std::wstring text;
-		std::wstring description; // ÐÂÔö£ºÃèÊöÎÄ±¾
+		std::wstring description; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½
 		std::function<void()> onClick;
 		std::function<void(bool)> b_onClick;
 		std::function<void(POINT)> onHover;
 		std::vector<VinaOption> subOptions;
 		std::vector<VinaOption> hoverOptions;
 		int activeStat = 1;
-		bool isSwitch = false; // ÐÂÔö£º¿ØÖÆÊÇ·ñÎª Switch ÀàÐÍ
+		bool isSwitch = false; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Îª Switch ï¿½ï¿½ï¿½ï¿½
 
 		VinaOption() : text(L""), description(L""), activeStat(1), isSwitch(false) {}
 
-		// ±£³Ö¼æÈÝÐÔµÄ¹¹Ôìº¯Êý£¨Í¨¹ýÄ©Î²Ä¬ÈÏ²ÎÊýÔö¼Ó isSwitch£©
+		// ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿½ï¿½ÔµÄ¹ï¿½ï¿½ìº¯ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½Ä©Î²Ä¬ï¿½Ï²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ isSwitchï¿½ï¿½
 		VinaOption(std::wstring t, std::function<void()> c, int a = 1, bool s = false)
 			: text(t), description(L""), onClick(c), activeStat(a), isSwitch(s) {
 		}
@@ -116,7 +116,7 @@ namespace VertexUI {
 	void MonitorValue2(float f)
 	{
 		wchar_t a[128];
-		swprintf_s(a, L"%f", f);  // Ê¹ÓÃswprintf_s½«float×ª»»Îª¿í×Ö·û×Ö·û´®
+		swprintf_s(a, L"%f", f);  // Ê¹ï¿½ï¿½swprintf_sï¿½ï¿½float×ªï¿½ï¿½Îªï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
 		OutputDebugString(a);
 		OutputDebugString(L"\n");
 		return;
@@ -128,7 +128,12 @@ namespace VertexUI {
 		pt.x = vp.x;
 		pt.y = vp.y;
 		//ClientToScreen(hWnd, &pt);
-		RECT  rc = { x * gScale,y * gScale,(x + sizex) * gScale,(y + sizey) * gScale };
+		RECT  rc = {
+			static_cast<LONG>(x * gScale),
+			static_cast<LONG>(y * gScale),
+			static_cast<LONG>((x + sizex) * gScale),
+			static_cast<LONG>((y + sizey) * gScale)
+		};
 		if (PtInRect(&rc, pt))
 		{
 			return 1;
@@ -740,7 +745,7 @@ namespace VertexUI {
 			int _curX, _curY;
 
 		public:
-			// ³õÊ¼»¯ÅÅ°æ²ÎÊý
+			// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Å°ï¿½ï¿½ï¿½ï¿½
 			void Begin(int startX, int startY, int itemW, int itemH, int gap, int boundWidth) {
 				_startX = startX;
 				_startY = startY;
@@ -753,24 +758,24 @@ namespace VertexUI {
 				_curY = startY;
 			}
 
-			// ºËÐÄ·½·¨£º´«Èë×é¼þ£¬×Ô¶¯¼ÆËã²¢ÉèÖÃËüµÄÎ»ÖÃ£¬È»ºóÒÆ¶¯Ö¸Õë
+			// ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ã²¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½È»ï¿½ï¿½ï¿½Æ¶ï¿½Ö¸ï¿½ï¿½
 			void AddElement(std::shared_ptr<T> element) {
 				if (!element) return;
 
-				// ¼ì²éÊÇ·ñÐèÒª»»ÐÐ£ºÈç¹ûµ±Ç° X + ×é¼þ¿í¶È³¬¹ýÁË±ß½ç£¬ÇÒµ±Ç°ÐÐ²»ÊÇ¿ÕµÄ
+				// ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç° X + ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È³ï¿½ï¿½ï¿½ï¿½Ë±ß½ç£¬ï¿½Òµï¿½Ç°ï¿½Ð²ï¿½ï¿½Ç¿Õµï¿½
 				if (_curX + _itemWidth > _boundWidth && _curX > _startX) {
 					_curX = _startX;
 					_curY += _itemHeight + _gap;
 				}
 
-				// Ö±½ÓÉèÖÃ×é¼þÎ»ÖÃ
+				// Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 				element->SetInfo(_curX, _curY, _itemWidth, _itemHeight);
 
-				// Ö¸ÕëÏòºóÒÆ¶¯
+				// Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
 				_curX += _itemWidth + _gap;
 			}
 
-			// »ñÈ¡µ±Ç°ÅÅ°æµ½µÄ¸ß¶È£¨·½±ãºóÐø½ÓÆäËûÄÚÈÝ£©
+			// ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½Å°æµ½ï¿½Ä¸ß¶È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½
 			int GetCurrentY() { return _curY + _itemHeight; }
 		};
 }

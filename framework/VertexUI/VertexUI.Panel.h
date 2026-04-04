@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 /*
 *
 * VertexUI PanelDrawingInterface
@@ -191,7 +191,7 @@ namespace VertexUI
 		COLORREF c2;
 		HWND h;
 	};
-	typedef struct PanelDCCache
+	struct PanelDCCache
 	{
 		HDC inhdc;//兼容VertexUI内建
 		HDC hdc;
@@ -815,7 +815,7 @@ namespace VertexUI
 			m_pGDIRT->ReleaseDC(NULL);
 			SafeRelease(&m_pGDIRT);
 		}
-		typedef void (D2DHWNDDRAWLAYERPANEL)(HWND, ID2D1HwndRenderTarget*, int x, int y, int cx, int cy);
+		typedef void (D2DHWNDDRAWLAYERPANEL)(HWND, ID2D1HwndRenderTarget*, float x, float y, float cx, float cy);
 		template <class T>
 		void D2DDrawInClippedRoundRect(HWND hWnd, T pRT, float x, float y, float cx, float cy, float rr, std::function<D2DHWNDDRAWLAYERPANEL> dwf)
 		{
@@ -1772,7 +1772,7 @@ namespace VertexUI
 			if ((NULL != pszPath) && (nWidth > 0.0) && (nHeight > 0.0))
 			{
 				IShellItemImageFactory* psif = NULL;
-				SIZE size = { nWidth, nHeight };
+				SIZE size = { static_cast<LONG>(nWidth), static_cast<LONG>(nHeight) };
 				HRESULT hr = ::SHCreateItemFromParsingName(pszPath, NULL, IID_PPV_ARGS(&psif));
 				if (SUCCEEDED(hr) && (NULL != psif))
 				{

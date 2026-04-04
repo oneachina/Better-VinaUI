@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 /*
 * VertexUI ClickArea
 *
@@ -48,7 +48,12 @@ namespace VertexUI
 			pt.x = vp.x;
 			pt.y = vp.y;
 			//ClientToScreen(hWnd, &pt);
-			RECT  rc = { x * gScale,y * gScale,(x + sizex) * gScale,(y + sizey) * gScale };
+			RECT  rc = {
+				static_cast<LONG>(x * gScale),
+				static_cast<LONG>(y * gScale),
+				static_cast<LONG>((x + sizex) * gScale),
+				static_cast<LONG>((y + sizey) * gScale)
+			};
 			rcx = { (long)(x * gScale),(long)(y * gScale),(long)((x + sizex) * gScale),(long)((y + sizey) * gScale) };
 			if (PtInRect(&rc, pt))
 			{
