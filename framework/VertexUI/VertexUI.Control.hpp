@@ -251,6 +251,30 @@ namespace VertexUI {
 		{
 			this->IsFocused=b;
 		}
+		void SetFontFamily(const std::wstring& family)
+		{
+			this->FontFamilyOverride = family;
+		}
+		void SetIconFontFamily(const std::wstring& family)
+		{
+			this->IconFontFamilyOverride = family;
+		}
+		void ClearFontFamily()
+		{
+			this->FontFamilyOverride.clear();
+		}
+		void ClearIconFontFamily()
+		{
+			this->IconFontFamilyOverride.clear();
+		}
+		const wchar_t* GetFontFamily() const
+		{
+			return this->FontFamilyOverride.empty() ? nullptr : this->FontFamilyOverride.c_str();
+		}
+		const wchar_t* GetIconFontFamily() const
+		{
+			return this->IconFontFamilyOverride.empty() ? nullptr : this->IconFontFamilyOverride.c_str();
+		}
 		int x, y, cx, cy;
 	private:
 
@@ -266,6 +290,8 @@ namespace VertexUI {
 		bool IsHoverd = false;
 		bool IsPushed = false;
 		bool IsInfoChanged = false;
+		std::wstring FontFamilyOverride;
+		std::wstring IconFontFamilyOverride;
 		D2DVertexUIPanel* parent;
 	};
 	class DrawPanel

@@ -866,6 +866,38 @@ public:
 	{
 		VertexUI::Panel::SetDefaultUIIconFontFamily(iconFontFamily);
 	}
+	void SetFontAlias(const wchar_t* alias, const wchar_t* actualFamily)
+	{
+		VertexUI::Panel::SetFontAlias(alias, actualFamily);
+	}
+	void ClearFontAliases()
+	{
+		VertexUI::Panel::ClearFontAliases();
+	}
+	void SetFontFallbackChain(const std::vector<std::wstring>& families)
+	{
+		VertexUI::Panel::SetUIFontFallbackChain(families);
+	}
+	void SetIconFontFallbackChain(const std::vector<std::wstring>& families)
+	{
+		VertexUI::Panel::SetUIIconFallbackChain(families);
+	}
+	void AddFontFallback(const wchar_t* family)
+	{
+		VertexUI::Panel::AddUIFontFallback(family);
+	}
+	void AddIconFontFallback(const wchar_t* family)
+	{
+		VertexUI::Panel::AddUIIconFallback(family);
+	}
+	void ClearFontFallbackChain()
+	{
+		VertexUI::Panel::ClearUIFontFallbackChain();
+	}
+	void ClearIconFontFallbackChain()
+	{
+		VertexUI::Panel::ClearUIIconFallbackChain();
+	}
 	bool RegisterFontFromFile(const wchar_t* filePath)
 	{
 		return VertexUI::Panel::RegisterFontFromFile(filePath);

@@ -155,7 +155,7 @@ public:
 		int fontSize = txtsz - (IsPushed ? (int)num : 0);
 		D2DDrawText2(hdc, txt.c_str(),
 			(float)x, (float)(y + cy / 2 - fontSize / 1.5),
-			cx, cy, fontSize, txtClr, L"Segoe UI", 1, true);
+			cx, cy, fontSize, txtClr, this->GetFontFamily(), 1, true);
 	}
 
 	void SetValidity(bool v) { Isvalid = v; }
@@ -1210,7 +1210,7 @@ public:
 			nG = GetMaxValue(GetGValue(Clr) + num * 20 * fact, 255);
 			nB = GetMaxValue(GetBValue(Clr) + num * 20 * fact, 255);
 			nClr = RGB(nR, nG, nB);
-			D2DDrawText(hdc, txt.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Segoe UI", 1);
+			D2DDrawText(hdc, txt.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetFontFamily(), 1);
 		}
 		else
 		{
@@ -1242,7 +1242,7 @@ public:
 				nB = GetMaxValue(GetBValue(Clr) + num * 20 * fact, 255);
 				nClr = RGB(nR, nG, nB);
 			}
-			D2DDrawText(hdc, txt.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Segoe UI", 1);
+			D2DDrawText(hdc, txt.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetFontFamily(), 1);
 		}
 	}
 	virtual int OnMouseUp()
@@ -1746,7 +1746,7 @@ public:
 				IDWriteTextFormat* pFormat = NULL;
 
 				pRT->CreateSolidColorBrush(D2D1::ColorF(RGBToHex(txtColor), 1.0f), &pTextBrush);
-				pDWriteFactory->CreateTextFormat(VertexUI::Panel::ResolveUIFontFamily(nullptr), NULL, DWRITE_FONT_WEIGHT_NORMAL,
+				pDWriteFactory->CreateTextFormat(VertexUI::Panel::ResolveUIFontFamily(this->GetFontFamily()), NULL, DWRITE_FONT_WEIGHT_NORMAL,
 					DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, textSize, L"", &pFormat);
 
 				if (pTextBrush && pFormat) {
@@ -2347,23 +2347,23 @@ public:
 			std::wstring newStr = this->CvtFont(txt.c_str());
 			if (txt == std::wstring(L"test-left"))
 			{
-				D2DDrawText(hdc, newStr.c_str(), x - num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Font Awesome 6 Free Solid", 1);
+				D2DDrawText(hdc, newStr.c_str(), x - num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
 			}
 			else if (txt == std::wstring(L"test-right"))
 			{
-				D2DDrawText(hdc, newStr.c_str(), x + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Font Awesome 6 Free Solid", 1);
+				D2DDrawText(hdc, newStr.c_str(), x + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
 			}
 			else if (txt == std::wstring(L"test-right-upd"))
 			{
-				D2DDrawText3(hdc, L"现在更新", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, L"Segoe UI", 1);
-				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Font Awesome 6 Free Solid", 1);
+				D2DDrawText3(hdc, L"现在更新", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, this->GetFontFamily(), 1);
+				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
 			}
 			else if (txt == std::wstring(L"test-right-dld"))
 			{
-				D2DDrawText3(hdc, L"下载", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, L"Segoe UI", 1);
-				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Font Awesome 6 Free Solid", 1);
+				D2DDrawText3(hdc, L"下载", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, this->GetFontFamily(), 1);
+				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
 			}
-			else D2DDrawText(hdc, newStr.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Font Awesome 6 Free Solid", 1);
+			else D2DDrawText(hdc, newStr.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
 		}
 		else
 		{
@@ -2398,23 +2398,23 @@ public:
 			std::wstring newStr = this->CvtFont(txt.c_str());
 			if (txt == std::wstring(L"test-left"))
 			{
-				D2DDrawText(hdc, newStr.c_str(), x - num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Font Awesome 6 Free Solid", 1);
+				D2DDrawText(hdc, newStr.c_str(), x - num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
 			}
 			else if (txt == std::wstring(L"test-right"))
 			{
-				D2DDrawText(hdc, newStr.c_str(), x + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Font Awesome 6 Free Solid", 1);
+				D2DDrawText(hdc, newStr.c_str(), x + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
 			}
 			else if (txt == std::wstring(L"test-right-upd"))
 			{
-				D2DDrawText3(hdc, L"现在更新", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, L"Segoe UI", 1);
-				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Font Awesome 6 Free Solid", 1);
+				D2DDrawText3(hdc, L"现在更新", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, this->GetFontFamily(), 1);
+				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
 			}
 			else if (txt == std::wstring(L"test-right-dld"))
 			{
-				D2DDrawText3(hdc, L"下载", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, L"Segoe UI", 1);
-				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Font Awesome 6 Free Solid", 1);
+				D2DDrawText3(hdc, L"下载", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, this->GetFontFamily(), 1);
+				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
 			}
-			else D2DDrawText(hdc, newStr.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, L"Font Awesome 6 Free Solid", 1);
+			else D2DDrawText(hdc, newStr.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
 
 		}
 	}

@@ -96,6 +96,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Optional: set a project-wide default UI font via API.
 	// MainWindow->SetDefaultFontFamily(L"Microsoft YaHei UI");
+	// MainWindow->SetFontAlias(L"ui-body", L"Microsoft YaHei UI");
+	// MainWindow->SetDefaultFontFamily(L"ui-body");
+	// MainWindow->AddFontFallback(L"Segoe UI Emoji");
 
 	auto fontData = AppResourceManager::LoadRawResource(hInstance, IDF_FONTAWESOME, L"BINARY");
 
