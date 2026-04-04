@@ -289,6 +289,8 @@ public:
 	{
 		RECT rc;
 		GetClientRect(hWnd, &rc);
+		const wchar_t* resolvedIconFont = VertexUI::Panel::ResolveUIIconFontFamily(this->GetIconFontFamily());
+		const wchar_t* resolvedTextFont = VertexUI::Panel::ResolveUIFontFamily(this->GetFontFamily());
 
 		RECT crc;
 
@@ -1180,6 +1182,8 @@ public:
 	{
 		RECT rc;
 		GetClientRect(hWnd, &rc);
+		const wchar_t* resolvedIconFont = VertexUI::Panel::ResolveUIIconFontFamily(this->GetIconFontFamily());
+		const wchar_t* resolvedTextFont = VertexUI::Panel::ResolveUIFontFamily(this->GetFontFamily());
 
 		if (GetPtInfo(hWnd, x, y, cx, cy))
 		{
@@ -2344,26 +2348,28 @@ public:
 			nG = GetMaxValue(GetGValue(Clr) + num * 20 * fact, 255);
 			nB = GetMaxValue(GetBValue(Clr) + num * 20 * fact, 255);
 			nClr = RGB(nR, nG, nB);
+			const wchar_t* resolvedIconFont = VertexUI::Panel::ResolveUIIconFontFamily(this->GetIconFontFamily());
+			const wchar_t* resolvedTextFont = VertexUI::Panel::ResolveUIFontFamily(this->GetFontFamily());
 			std::wstring newStr = this->CvtFont(txt.c_str());
 			if (txt == std::wstring(L"test-left"))
 			{
-				D2DDrawText(hdc, newStr.c_str(), x - num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
+				D2DDrawText(hdc, newStr.c_str(), x - num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, resolvedIconFont, 1);
 			}
 			else if (txt == std::wstring(L"test-right"))
 			{
-				D2DDrawText(hdc, newStr.c_str(), x + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
+				D2DDrawText(hdc, newStr.c_str(), x + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, resolvedIconFont, 1);
 			}
 			else if (txt == std::wstring(L"test-right-upd"))
 			{
-				D2DDrawText3(hdc, L"现在更新", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, this->GetFontFamily(), 1);
-				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
+				D2DDrawText3(hdc, L"现在更新", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, resolvedTextFont, 1);
+				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, resolvedIconFont, 1);
 			}
 			else if (txt == std::wstring(L"test-right-dld"))
 			{
-				D2DDrawText3(hdc, L"下载", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, this->GetFontFamily(), 1);
-				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
+				D2DDrawText3(hdc, L"下载", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, resolvedTextFont, 1);
+				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, resolvedIconFont, 1);
 			}
-			else D2DDrawText(hdc, newStr.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
+			else D2DDrawText(hdc, newStr.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, resolvedIconFont, 1);
 		}
 		else
 		{
@@ -2395,26 +2401,28 @@ public:
 				nB = GetMaxValue(GetBValue(Clr) + num * 20 * fact, 255);
 				nClr = RGB(nR, nG, nB);
 			}
+			const wchar_t* resolvedIconFont = VertexUI::Panel::ResolveUIIconFontFamily(this->GetIconFontFamily());
+			const wchar_t* resolvedTextFont = VertexUI::Panel::ResolveUIFontFamily(this->GetFontFamily());
 			std::wstring newStr = this->CvtFont(txt.c_str());
 			if (txt == std::wstring(L"test-left"))
 			{
-				D2DDrawText(hdc, newStr.c_str(), x - num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
+				D2DDrawText(hdc, newStr.c_str(), x - num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, resolvedIconFont, 1);
 			}
 			else if (txt == std::wstring(L"test-right"))
 			{
-				D2DDrawText(hdc, newStr.c_str(), x + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
+				D2DDrawText(hdc, newStr.c_str(), x + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, resolvedIconFont, 1);
 			}
 			else if (txt == std::wstring(L"test-right-upd"))
 			{
-				D2DDrawText3(hdc, L"现在更新", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, this->GetFontFamily(), 1);
-				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
+				D2DDrawText3(hdc, L"现在更新", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, resolvedTextFont, 1);
+				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, resolvedIconFont, 1);
 			}
 			else if (txt == std::wstring(L"test-right-dld"))
 			{
-				D2DDrawText3(hdc, L"下载", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, this->GetFontFamily(), 1);
-				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
+				D2DDrawText3(hdc, L"下载", x - 5 + num * 3, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz - 4, nClr, resolvedTextFont, 1);
+				D2DDrawText(hdc, newStr.c_str(), x + cx - txtsz + num * 3, (float)(y + 1 + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, resolvedIconFont, 1);
 			}
-			else D2DDrawText(hdc, newStr.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, this->GetIconFontFamily(), 1);
+			else D2DDrawText(hdc, newStr.c_str(), x, (float)(y + cy / 2 - txtsz / 1.5), cx, cy, txtsz, nClr, resolvedIconFont, 1);
 
 		}
 	}
