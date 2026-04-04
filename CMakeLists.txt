@@ -6,27 +6,39 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(vina_demo WIN32
-  apps/vina-demo/src/VinaApp.cpp
-  apps/vina-demo/resources/VinaApp.rc
+add_library(vina_compile_options INTERFACE)
+target_compile_definitions(vina_compile_options INTERFACE UNICODE _UNICODE)
+target_compile_options(vina_compile_options INTERFACE
+  $<$<CXX_COMPILER_ID:MSVC>:/utf-8>
+  $<$<CXX_COMPILER_ID:MSVC>:/permissive>
+  $<$<CXX_COMPILER_ID:MSVC>:/Zc:strictStrings->
+  $<$<CXX_COMPILER_ID:MSVC>:/wd4828>
+  $<$<CXX_COMPILER_ID:MSVC>:/WX->
 )
 
-target_include_directories(vina_demo PRIVATE
-  apps/vina-demo/src
-  apps/vina-demo/resources
+add_library(vina_framework_headers INTERFACE)
+target_include_directories(vina_framework_headers INTERFACE
   framework
   framework/Vina
+)
+
+add_library(vina_vertexui_headers INTERFACE)
+target_include_directories(vina_vertexui_headers INTERFACE
   framework/VertexUI
+)
+
+add_library(vina_parser_headers INTERFACE)
+target_include_directories(vina_parser_headers INTERFACE
+  framework/VertexUI/vui.parser
+)
+
+add_library(vina_third_party_headers INTERFACE)
+target_include_directories(vina_third_party_headers INTERFACE
   third_party
 )
 
-target_compile_definitions(vina_demo PRIVATE UNICODE _UNICODE)
-
-if(MSVC)
-  target_compile_options(vina_demo PRIVATE /utf-8 /permissive /Zc:strictStrings- /wd4828 /WX-)
-endif()
-
-target_link_libraries(vina_demo PRIVATE
+add_library(vina_win32_libs INTERFACE)
+target_link_libraries(vina_win32_libs INTERFACE
   d2d1
   dwrite
   windowscodecs
@@ -42,6 +54,24 @@ target_link_libraries(vina_demo PRIVATE
   advapi32
 )
 
+add_executable(vina_demo WIN32
+  apps/vina-demo/src/VinaApp.cpp
+  apps/vina-demo/resources/VinaApp.rc
+)
+
+target_include_directories(vina_demo PRIVATE
+  apps/vina-demo/src
+  apps/vina-demo/resources
+)
+
+target_link_libraries(vina_demo PRIVATE
+  vina_compile_options
+  vina_framework_headers
+  vina_vertexui_headers
+  vina_third_party_headers
+  vina_win32_libs
+)
+
 option(BUILD_VUI_PARSER_CLI "Build vui.parser command line demo target" OFF)
 
 if(BUILD_VUI_PARSER_CLI)
@@ -49,14 +79,8 @@ if(BUILD_VUI_PARSER_CLI)
     framework/VertexUI/vui.parser/main.cpp
   )
 
-  target_include_directories(vui_parser_cli PRIVATE
-    framework/VertexUI
-    framework/VertexUI/vui.parser
+  target_link_libraries(vui_parser_cli PRIVATE
+    vina_compile_options
+    vina_parser_headers
   )
-
-  target_compile_definitions(vui_parser_cli PRIVATE UNICODE _UNICODE)
-
-  if(MSVC)
-    target_compile_options(vui_parser_cli PRIVATE /utf-8 /permissive /Zc:strictStrings- /wd4828 /WX-)
-  endif()
 endif()
