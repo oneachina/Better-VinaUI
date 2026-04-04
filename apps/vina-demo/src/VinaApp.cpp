@@ -1,4 +1,4 @@
-﻿#include "VinaApp.h"
+#include "VinaApp.h"
 
 struct WaterfallCard {
 	float y;
@@ -94,20 +94,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	gScale = GetScreenScale();
 	//LoadVinaCom();
 
+	// Optional: set a project-wide default UI font via API.
+	// MainWindow->SetDefaultFontFamily(L"Microsoft YaHei UI");
+
 	auto fontData = AppResourceManager::LoadRawResource(hInstance, IDF_FONTAWESOME, L"BINARY");
 
 	if (!fontData.empty()) {
-		DWORD nFonts = 0;
-		static UniqueFontHandle myFontHandle{
-			AddFontMemResourceEx((void*)fontData.data(), (DWORD)fontData.size(), nullptr, &nFonts)
-		};
+		MainWindow->RegisterFontFromMemory(fontData.data(), (DWORD)fontData.size());
 	}
 
 	namespace fs = std::filesystem;
 	fs::path fontPath =  L"Font-AwesomeFree.ttf";
 
 	FreeAnyResource(IDF_FONTAWESOME, L"BINARY", fontPath.c_str());
-	AddFontResource(fontPath.c_str());
+	MainWindow->RegisterFontFromFile(fontPath.c_str());
 
 	auto ctx = std::make_shared<MainAppContext>();
 

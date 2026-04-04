@@ -1,7 +1,7 @@
 #pragma once
 #include "VinaComponents.hpp"
 /*
-±¾ÎÄ¼þÎª¾É°æÊ¾ÀýµÄÒ»Ð©¸¨Öúº¯Êý£¬Êµ¼ÊÊ¹ÓÃÊ±¿ÉÉ¾³ý¡£
+ï¿½ï¿½ï¿½Ä¼ï¿½Îªï¿½É°ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ò»Ð©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½Ê¹ï¿½ï¿½Ê±ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½
 */
 
 HANDLE hMyFont;
@@ -167,41 +167,41 @@ void SetDataBase()
         mkdirs(LocalData2);
     }
 }
-/*ÒýÓÃ´úÂë*/
+/*ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½*/
 BOOL FreeAnyResource(int Id, const wchar_t* Type, const wchar_t* Dir)
 {
     HMODULE hModule = GetModuleHandle(NULL);
     if (hModule == NULL)
     {
-        std::cerr << "´íÎó£º»ñÈ¡Ä£¿é¾ä±úÊ§°Ü¡£" << std::endl;
+        std::cerr << "ï¿½ï¿½ï¿½ó£º»ï¿½È¡Ä£ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü¡ï¿½" << std::endl;
         return FALSE;
     }
 
     HRSRC hRsrc = FindResource(hModule, MAKEINTRESOURCE(Id), Type);
     if (hRsrc == NULL)
     {
-        std::cerr << "´íÎó£ºÎÞ·¨ÕÒµ½×ÊÔ´¡£" << std::endl;
+        std::cerr << "ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½Òµï¿½ï¿½ï¿½Ô´ï¿½ï¿½" << std::endl;
         return FALSE;
     }
 
     DWORD dwSize = SizeofResource(hModule, hRsrc);
     if (dwSize == 0)
     {
-        std::cerr << "´íÎó£ºÎÞÐ§µÄ×ÊÔ´´óÐ¡¡£" << std::endl;
+        std::cerr << "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½Ð¡ï¿½ï¿½" << std::endl;
         return FALSE;
     }
 
     HGLOBAL hGlobal = LoadResource(hModule, hRsrc);
     if (hGlobal == NULL)
     {
-        std::cerr << "´íÎó£ºÎÞ·¨¼ÓÔØ×ÊÔ´¡£" << std::endl;
+        std::cerr << "ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½" << std::endl;
         return FALSE;
     }
 
     LPVOID lpVoid = LockResource(hGlobal);
     if (lpVoid == NULL)
     {
-        std::cerr << "´íÎó£ºÎÞ·¨Ëø¶¨×ÊÔ´¡£" << std::endl;
+        std::cerr << "ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½" << std::endl;
         FreeResource(hGlobal);
         return FALSE;
     }
@@ -209,7 +209,7 @@ BOOL FreeAnyResource(int Id, const wchar_t* Type, const wchar_t* Dir)
     FILE* fp = _wfopen(Dir, L"wb+");
     if (fp == NULL)
     {
-        std::cerr << "´íÎó£ºÎÞ·¨´´½¨»ò´ò¿ªÎÄ¼þ¡£" << std::endl;
+        std::cerr << "ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½" << std::endl;
         FreeResource(hGlobal);
         return FALSE;
     }
@@ -239,7 +239,7 @@ float VuiMeasureStringWidth(const std::wstring& str, int fontSize) {
     IDWriteTextFormat* pTextFormat = NULL;
     float width = 0.0f;
 
-    HRESULT hr = pDWriteFactory->CreateTextFormat(L"Segoe UI", NULL, DWRITE_FONT_WEIGHT_NORMAL,
+    HRESULT hr = pDWriteFactory->CreateTextFormat(VertexUI::Panel::ResolveUIFontFamily(nullptr), NULL, DWRITE_FONT_WEIGHT_NORMAL,
         DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, (float)fontSize, L"", &pTextFormat);
 
     if (SUCCEEDED(hr)) {
@@ -299,7 +299,7 @@ if (n == 1)
         firstCtrlPt[0].x = (2 * knots[0].x + knots[1].x) / 3.0f;
              firstCtrlPt[0].y = (2 * knots[0].y + knots[1].y) / 3.0f;
     
-          // P2 = 2P1 ¨C P0
+          // P2 = 2P1 ï¿½C P0
       secondCtrlPt[0].x = 2 * firstCtrlPt[0].x - knots[0].x;
              secondCtrlPt[0].y = 2 * firstCtrlPt[0].y - knots[0].y;
              return;

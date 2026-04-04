@@ -215,6 +215,16 @@ namespace VertexUI
 	VertexUIPos SharedPos;
 	namespace Panel
 	{
+		const wchar_t* GetDefaultUIFontFamily();
+		const wchar_t* GetDefaultUIIconFontFamily();
+		void SetDefaultUIFontFamily(const wchar_t* fontFamily);
+		void SetDefaultUIIconFontFamily(const wchar_t* iconFontFamily);
+		const wchar_t* ResolveUIFontFamily(const wchar_t* requested);
+		const wchar_t* ResolveUIIconFontFamily(const wchar_t* requested);
+		bool RegisterFontFromFile(const wchar_t* filePath);
+		bool RegisterFontFromMemory(const void* data, DWORD size, HANDLE* outHandle);
+		void UnregisterAllCustomFonts();
+
 		//CreatePanel only passed in parameters below:(HWND,HDC).
 
 		//It convert (x,y,sizex,sizey) into RECT {x,y,x+sizex,y+sizey}.
@@ -913,8 +923,9 @@ namespace VertexUI
 			D2DDrawInClippedRoundRect<ID2D1HwndRenderTarget*>(pRT->GetHwnd(), pRT, x, y, cx, cy, rr, drawLightEffect);
 		}
 		template<class T>
-		void D2DDrawText(T pRenderTarget, const wchar_t* Text, float x, float y, int cx, int cy, float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE, const wchar_t* font = L"Segoe UI", float alpha = 1, DWRITE_FONT_WEIGHT wid = DWRITE_FONT_WEIGHT_NORMAL)
+		void D2DDrawText(T pRenderTarget, const wchar_t* Text, float x, float y, int cx, int cy, float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE, const wchar_t* font = nullptr, float alpha = 1, DWRITE_FONT_WEIGHT wid = DWRITE_FONT_WEIGHT_NORMAL)
 		{
+			const wchar_t* resolvedFont = ResolveUIFontFamily(font);
 			IDWriteTextFormat* pTextFormat = NULL;
 			ID2D1SolidColorBrush* testBrush = NULL;
 			pRenderTarget->CreateSolidColorBrush(
@@ -923,7 +934,7 @@ namespace VertexUI
 			);
 			//create text format
 			pDWriteFactory->CreateTextFormat(
-				font,
+				resolvedFont,
 				NULL,
 				wid,
 				DWRITE_FONT_STYLE_NORMAL,
@@ -947,8 +958,9 @@ namespace VertexUI
 			SafeRelease(&testBrush);
 		}
 		template<class T>
-		void D2DDrawText2(T pRenderTarget, const wchar_t* Text, float x, float y, float cx, float cy, float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE, const wchar_t* font = L"Segoe UI", float alpha = 1, bool center = false)
+		void D2DDrawText2(T pRenderTarget, const wchar_t* Text, float x, float y, float cx, float cy, float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE, const wchar_t* font = nullptr, float alpha = 1, bool center = false)
 		{
+			const wchar_t* resolvedFont = ResolveUIFontFamily(font);
 			IDWriteTextFormat* pTextFormat = NULL;
 			ID2D1SolidColorBrush* testBrush = NULL;
 			pRenderTarget->CreateSolidColorBrush(
@@ -957,7 +969,7 @@ namespace VertexUI
 			);
 			//create text format
 			pDWriteFactory->CreateTextFormat(
-				font,
+				resolvedFont,
 				NULL,
 				DWRITE_FONT_WEIGHT_NORMAL,
 				DWRITE_FONT_STYLE_NORMAL,
@@ -981,8 +993,9 @@ namespace VertexUI
 			SafeRelease(&testBrush);
 		}
 		template<class T>
-		void D2DDrawText3(T pRenderTarget, const wchar_t* Text, float x, float y, float cx, float cy, float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE, const wchar_t* font = L"Segoe UI", float alpha = 1, bool center = false)
+		void D2DDrawText3(T pRenderTarget, const wchar_t* Text, float x, float y, float cx, float cy, float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE, const wchar_t* font = nullptr, float alpha = 1, bool center = false)
 		{
+			const wchar_t* resolvedFont = ResolveUIFontFamily(font);
 			IDWriteTextFormat* pTextFormat = NULL;
 			ID2D1SolidColorBrush* testBrush = NULL;
 			pRenderTarget->CreateSolidColorBrush(
@@ -991,7 +1004,7 @@ namespace VertexUI
 			);
 			//create text format
 			pDWriteFactory->CreateTextFormat(
-				font,
+				resolvedFont,
 				NULL,
 				DWRITE_FONT_WEIGHT_SEMI_BOLD,
 				DWRITE_FONT_STYLE_NORMAL,
@@ -1038,11 +1051,13 @@ namespace VertexUI
 		template<class T>
 		void D2DDrawText4(T pRenderTarget, const wchar_t* Text, float x, float y, float cx, float cy,
 			float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE,
-			const wchar_t* font = L"Segoe UI", float alpha = 1, bool center = false,
-			const wchar_t* iconFont = L"Font Awesome 6 Free Solid") // 添加图标字体参数
+			const wchar_t* font = nullptr, float alpha = 1, bool center = false,
+			const wchar_t* iconFont = nullptr) // 添加图标字体参数
 		{
 			if (!Text) return;
 			if (cx < 5 || cy == 5)return;
+			const wchar_t* resolvedFont = ResolveUIFontFamily(font);
+			const wchar_t* resolvedIconFont = ResolveUIIconFontFamily(iconFont);
 
 			std::wstring fullText = Text;
 			auto iconMatches = FindIconPatterns(fullText);
@@ -1050,7 +1065,7 @@ namespace VertexUI
 			// 创建默认字体格式
 			IDWriteTextFormat* pDefaultFormat = NULL;
 			pDWriteFactory->CreateTextFormat(
-				font,
+				resolvedFont,
 				NULL,
 				DWRITE_FONT_WEIGHT_NORMAL,
 				DWRITE_FONT_STYLE_NORMAL,
@@ -1063,7 +1078,7 @@ namespace VertexUI
 			// 创建图标字体格式
 			IDWriteTextFormat* pIconFormat = NULL;
 			pDWriteFactory->CreateTextFormat(
-				iconFont,
+				resolvedIconFont,
 				NULL,
 				DWRITE_FONT_WEIGHT_NORMAL,
 				DWRITE_FONT_STYLE_NORMAL,
@@ -1112,7 +1127,7 @@ namespace VertexUI
 					DWRITE_TEXT_RANGE range;
 					range.startPosition = static_cast<UINT32>(match.first);
 					range.length = static_cast<UINT32>(match.second - match.first + 1); // 包含两个冒号
-					pTextLayout->SetFontFamilyName(iconFont, range);
+					pTextLayout->SetFontFamilyName(resolvedIconFont, range);
 				}
 
 				pRenderTarget->DrawTextLayout(
@@ -1132,11 +1147,13 @@ namespace VertexUI
 		template<class T>
 		void D2DDrawText4_1(T pRenderTarget, const wchar_t* Text, float x, float y, float cx, float cy,
 			float Size = 18, unsigned long ClrFill = VERTEXUICOLOR_WHITE,
-			const wchar_t* font = L"Segoe UI", float alpha = 1, bool center = false,
-			const wchar_t* iconFont = L"Font Awesome 6 Free Solid")
+			const wchar_t* font = nullptr, float alpha = 1, bool center = false,
+			const wchar_t* iconFont = nullptr)
 		{
 			if (!Text || !pRenderTarget) return;
 			if (cx < 5 || cy < 5) return;
+			const wchar_t* resolvedFont = ResolveUIFontFamily(font);
+			const wchar_t* resolvedIconFont = ResolveUIIconFontFamily(iconFont);
 
 			std::wstring fullText = Text;
 			auto iconMatches = FindIconPatterns(fullText);
@@ -1144,7 +1161,7 @@ namespace VertexUI
 			// 1. 创建半粗体格式，样式改为 NORMAL (不再使用 OBLIQUE)
 			IDWriteTextFormat* pDefaultFormat = NULL;
 			pDWriteFactory->CreateTextFormat(
-				font,
+				resolvedFont,
 				NULL,
 				DWRITE_FONT_WEIGHT_SEMI_BOLD,
 				DWRITE_FONT_STYLE_NORMAL, // 这里改回正常，后面用矩阵倾斜
@@ -1157,7 +1174,7 @@ namespace VertexUI
 			// 2. 创建图标字体格式
 			IDWriteTextFormat* pIconFormat = NULL;
 			pDWriteFactory->CreateTextFormat(
-				iconFont,
+				resolvedIconFont,
 				NULL,
 				DWRITE_FONT_WEIGHT_NORMAL,
 				DWRITE_FONT_STYLE_NORMAL,
@@ -1222,7 +1239,7 @@ namespace VertexUI
 					DWRITE_TEXT_RANGE range;
 					range.startPosition = static_cast<UINT32>(match.first);
 					range.length = static_cast<UINT32>(match.second - match.first + 1);
-					pTextLayout->SetFontFamilyName(iconFont, range);
+					pTextLayout->SetFontFamilyName(resolvedIconFont, range);
 				}
 
 				pRenderTarget->DrawTextLayout(
@@ -1641,7 +1658,7 @@ namespace VertexUI
 			{
 				memset(&lf, 0, sizeof(LOGFONT));
 				lf.lfHeight = -18;
-				wcscpy_s(lf.lfFaceName, L"Segoe UI");
+				wcscpy_s(lf.lfFaceName, ResolveUIFontFamily(nullptr));
 				hFont = CreateFontIndirect(&lf);  // create the font
 			}
 			HFONT old = (HFONT)SelectObject(hdc, hFont);
@@ -1665,7 +1682,7 @@ namespace VertexUI
 				memset(&lf, 0, sizeof(LOGFONT));
 				lf.lfHeight = -sz;
 				//lf.lfWeight = 10;
-				wcscpy_s(lf.lfFaceName, L"Segoe UI");
+				wcscpy_s(lf.lfFaceName, ResolveUIFontFamily(nullptr));
 				hFont = CreateFontIndirect(&lf);  // create the font
 			}
 			HFONT old = (HFONT)SelectObject(hdc, hFont);
@@ -1711,7 +1728,7 @@ namespace VertexUI
 					flag = 0;
 				}
 				//lf.lfQuality = ANTIALIASED_QUALITY;
-				wcscpy_s(lf.lfFaceName, Font);
+				wcscpy_s(lf.lfFaceName, ResolveUIFontFamily(Font));
 				hFont = CreateFontIndirect(&lf);  // create the font
 			}
 			HFONT old = (HFONT)SelectObject(hdc, hFont);
@@ -1738,7 +1755,7 @@ namespace VertexUI
 			DeleteObject(hFont);
 			SelectObject(hdc, old);
 		}
-		int TextDrawOuter(HDC hDrawingDC, int x, int y, int cx, int cy, int sz, int mode, const wchar_t* txt, const wchar_t* font = L"Segoe UI", int outsz = 1, COLORREF inC = 0, COLORREF OutC = VERTEXUICOLOR_WHITE)
+		int TextDrawOuter(HDC hDrawingDC, int x, int y, int cx, int cy, int sz, int mode, const wchar_t* txt, const wchar_t* font = nullptr, int outsz = 1, COLORREF inC = 0, COLORREF OutC = VERTEXUICOLOR_WHITE)
 		{
 			::BeginPath(hDrawingDC);
 			_TextPreDrawEx(hDrawingDC, x, y, cx, cy, txt, sz, font, mode, 0);
@@ -2406,6 +2423,92 @@ namespace VertexUI
 
 namespace VertexUI::Panel
 {
+	// Global font configuration and runtime registration API.
+	inline std::wstring& GetDefaultUIFontStorage()
+	{
+		static std::wstring s_font = L"Segoe UI";
+		return s_font;
+	}
+	inline std::wstring& GetDefaultUIIconFontStorage()
+	{
+		static std::wstring s_iconFont = L"Font Awesome 6 Free Solid";
+		return s_iconFont;
+	}
+	inline std::vector<HANDLE>& GetRegisteredMemFonts()
+	{
+		static std::vector<HANDLE> s_handles;
+		return s_handles;
+	}
+	inline std::vector<std::wstring>& GetRegisteredFileFonts()
+	{
+		static std::vector<std::wstring> s_files;
+		return s_files;
+	}
+	inline const wchar_t* GetDefaultUIFontFamily()
+	{
+		return GetDefaultUIFontStorage().c_str();
+	}
+	inline const wchar_t* GetDefaultUIIconFontFamily()
+	{
+		return GetDefaultUIIconFontStorage().c_str();
+	}
+	inline void SetDefaultUIFontFamily(const wchar_t* fontFamily)
+	{
+		if (fontFamily && fontFamily[0] != L'\0') {
+			GetDefaultUIFontStorage() = fontFamily;
+		}
+	}
+	inline void SetDefaultUIIconFontFamily(const wchar_t* iconFontFamily)
+	{
+		if (iconFontFamily && iconFontFamily[0] != L'\0') {
+			GetDefaultUIIconFontStorage() = iconFontFamily;
+		}
+	}
+	inline const wchar_t* ResolveUIFontFamily(const wchar_t* requested)
+	{
+		if (requested == nullptr || requested[0] == L'\0' || wcscmp(requested, L"Segoe UI") == 0) {
+			return GetDefaultUIFontFamily();
+		}
+		return requested;
+	}
+	inline const wchar_t* ResolveUIIconFontFamily(const wchar_t* requested)
+	{
+		if (requested == nullptr || requested[0] == L'\0' || wcscmp(requested, L"Font Awesome 6 Free Solid") == 0) {
+			return GetDefaultUIIconFontFamily();
+		}
+		return requested;
+	}
+	inline bool RegisterFontFromFile(const wchar_t* filePath)
+	{
+		if (!filePath || filePath[0] == L'\0') return false;
+		if (AddFontResourceExW(filePath, FR_PRIVATE, 0) > 0) {
+			GetRegisteredFileFonts().push_back(filePath);
+			return true;
+		}
+		return false;
+	}
+	inline bool RegisterFontFromMemory(const void* data, DWORD size, HANDLE* outHandle = nullptr)
+	{
+		if (!data || size == 0) return false;
+		DWORD nFonts = 0;
+		HANDLE h = AddFontMemResourceEx(const_cast<void*>(data), size, nullptr, &nFonts);
+		if (!h) return false;
+		GetRegisteredMemFonts().push_back(h);
+		if (outHandle) *outHandle = h;
+		return true;
+	}
+	inline void UnregisterAllCustomFonts()
+	{
+		for (HANDLE h : GetRegisteredMemFonts()) {
+			if (h) RemoveFontMemResourceEx(h);
+		}
+		GetRegisteredMemFonts().clear();
+		for (const auto& file : GetRegisteredFileFonts()) {
+			RemoveFontResourceExW(file.c_str(), FR_PRIVATE, 0);
+		}
+		GetRegisteredFileFonts().clear();
+	}
+
 	void XSleep(UINT Delay_ms)
 	{
 		DWORD dwTick = GetTickCount64() + Delay_ms;

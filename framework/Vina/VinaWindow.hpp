@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "VinaCommonCtls.hpp"
 #include <Windowsx.h>
 #include <ole2.h>
@@ -857,6 +857,26 @@ public:
 	void SetDropEffect(DWORD effect)
 	{
 		this->m_dwDropEffect = effect;
+	}
+	void SetDefaultFontFamily(const wchar_t* fontFamily)
+	{
+		VertexUI::Panel::SetDefaultUIFontFamily(fontFamily);
+	}
+	void SetDefaultIconFontFamily(const wchar_t* iconFontFamily)
+	{
+		VertexUI::Panel::SetDefaultUIIconFontFamily(iconFontFamily);
+	}
+	bool RegisterFontFromFile(const wchar_t* filePath)
+	{
+		return VertexUI::Panel::RegisterFontFromFile(filePath);
+	}
+	bool RegisterFontFromMemory(const void* data, DWORD size, HANDLE* outHandle = nullptr)
+	{
+		return VertexUI::Panel::RegisterFontFromMemory(data, size, outHandle);
+	}
+	void UnregisterAllCustomFonts()
+	{
+		VertexUI::Panel::UnregisterAllCustomFonts();
 	}
 	void InitTrayIcon(std::function<void()> left, std::function<void()> right)
 	{

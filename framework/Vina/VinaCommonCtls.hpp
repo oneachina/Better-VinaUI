@@ -1746,7 +1746,7 @@ public:
 				IDWriteTextFormat* pFormat = NULL;
 
 				pRT->CreateSolidColorBrush(D2D1::ColorF(RGBToHex(txtColor), 1.0f), &pTextBrush);
-				pDWriteFactory->CreateTextFormat(L"Segoe UI", NULL, DWRITE_FONT_WEIGHT_NORMAL,
+				pDWriteFactory->CreateTextFormat(VertexUI::Panel::ResolveUIFontFamily(nullptr), NULL, DWRITE_FONT_WEIGHT_NORMAL,
 					DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, textSize, L"", &pFormat);
 
 				if (pTextBrush && pFormat) {
@@ -1997,7 +1997,7 @@ private:
 		IDWriteTextFormat* pTextFormat = NULL;
 		float width = 0.0f;
 
-		HRESULT hr = pDWriteFactory->CreateTextFormat(L"Segoe UI", NULL, DWRITE_FONT_WEIGHT_NORMAL,
+		HRESULT hr = pDWriteFactory->CreateTextFormat(VertexUI::Panel::ResolveUIFontFamily(nullptr), NULL, DWRITE_FONT_WEIGHT_NORMAL,
 			DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, (float)fontSize, L"", &pTextFormat);
 
 		if (SUCCEEDED(hr)) {
