@@ -4,6 +4,8 @@
 #include <ole2.h>
 #include <shlobj.h>
 #include <shellapi.h>
+#include <chrono>
+#include <unordered_set>
 #include "VinaFileDrag.hpp"
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "shell32.lib")
@@ -56,6 +58,10 @@ std::wstring GenerateRandomString(int len) {
 
 class AnimationManager {
 private:
+	double NowSeconds() const {
+		using namespace std::chrono;
+		return duration<double>(steady_clock::now().time_since_epoch()).count();
+	}
 	struct AnimationTask {
 		int id;
 		std::function<double(double)> progressFunc; 
@@ -69,7 +75,7 @@ private:
 
 	std::vector<AnimationTask> tasks;
 	int nextId = 1;
-	static constexpr double FRAME_RATE = 10.0;  //60FPS
+	static constexpr double FRAME_RATE = 60.0;
 
 public:
 	// 创建基础动画
@@ -82,7 +88,7 @@ public:
 		task.progressFunc = progressFunc ? progressFunc : [](double t) { return t; };
 		task.updateFunc = updateFunc;
 		task.completeFunc = completeFunc;
-		task.startTime = GetTickCount64() / 1000.0;
+		task.startTime = NowSeconds();
 		task.duration = duration;
 		task.isActive = true;
 		task.targetHwnd = hwnd;
@@ -126,49 +132,40 @@ public:
 	}
 
 	void UpdateAnimations() {
-		double currentTime = GetTickCount64() / 1000.0;
+		double currentTime = NowSeconds();
 
-		// 1. 第一阶段：仅计算数值，并收集需要执行的回调
-		struct PendingCallback {
-			std::function<void()> func;
-			HWND hwnd;
-		};
-		std::vector<PendingCallback> callbacks;
+		std::vector<std::function<void()>> completeCallbacks;
+		std::unordered_set<HWND> windowsToRefresh;
 
 		for (auto& task : tasks) {
 			if (!task.isActive) continue;
 
 			double elapsed = currentTime - task.startTime;
-			double progress = std::min(elapsed / task.duration, 1.0);
+			double progress = task.duration <= 0.0 ? 1.0 : std::min(elapsed / task.duration, 1.0);
 
 			if (task.progressFunc && task.updateFunc) {
 				double currentProgress = task.progressFunc(progress);
 				task.updateFunc(currentProgress);
 			}
+			if (task.targetHwnd && IsWindow(task.targetHwnd)) {
+				windowsToRefresh.insert(task.targetHwnd);
+			}
 			if (elapsed >= task.duration) {
 				task.isActive = false; 
-				if (task.completeFunc || task.targetHwnd) {
-	
-					callbacks.push_back({ task.completeFunc, task.targetHwnd });
-				}
-			}
-			else {
-
-				if (task.targetHwnd) {
-					callbacks.push_back({ nullptr, task.targetHwnd });
+				if (task.completeFunc) {
+					completeCallbacks.push_back(task.completeFunc);
 				}
 			}
 		}
 
 		Cleanup();
 
-
-		for (const auto& cb : callbacks) {
-			if (cb.func) {
-				cb.func(); // 执行 onComplete
-			}
-			if (cb.hwnd && IsWindow(cb.hwnd)) {
-				Refresh(cb.hwnd); 
+		for (const auto& complete : completeCallbacks) {
+			complete();
+		}
+		for (HWND hwnd : windowsToRefresh) {
+			if (hwnd && IsWindow(hwnd)) {
+				Refresh(hwnd);
 			}
 		}
 	}
@@ -771,7 +768,7 @@ public:
 	}
 	void StartAnimationSystem() // 新版的动画函数
 	{
-		SetTimer(this->hWnd, 12, 10, 0);
+		SetTimer(this->hWnd, 12, 16, 0);
 	}
 	void StopAnimationSystem() // 新版的动画函数
 	{
