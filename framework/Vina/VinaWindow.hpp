@@ -858,6 +858,29 @@ public:
 	{
 		this->m_dwDropEffect = effect;
 	}
+	void SetThemeDark()
+	{
+		VertexUI::Panel::SetThemeDark();
+		if (this->hWnd) VertexUI::Panel::Refresh(this->hWnd);
+	}
+	void SetThemeLight()
+	{
+		VertexUI::Panel::SetThemeLight();
+		if (this->hWnd) VertexUI::Panel::Refresh(this->hWnd);
+	}
+	void SetThemeCustom(const VertexUI::Panel::ThemePalette& palette)
+	{
+		VertexUI::Panel::SetThemeCustom(palette);
+		if (this->hWnd) VertexUI::Panel::Refresh(this->hWnd);
+	}
+	const wchar_t* GetCurrentThemeName() const
+	{
+		return VertexUI::Panel::GetCurrentThemeName();
+	}
+	VertexUI::Panel::ThemePalette GetCurrentThemePalette() const
+	{
+		return VertexUI::Panel::GetCurrentThemePalette();
+	}
 	void SetDefaultFontFamily(const wchar_t* fontFamily)
 	{
 		VertexUI::Panel::SetDefaultUIFontFamily(fontFamily);

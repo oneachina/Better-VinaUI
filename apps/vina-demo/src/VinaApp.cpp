@@ -396,6 +396,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		min->Set(rc.right / gScale - 32 - 32 - 32, 20, L"win-min", 15, VERTEXUICOLOR_WHITE, [hWnd] {MainWindow->KillAnimation(); SendMessage(hWnd, WM_SYSCOMMAND, SC_MINIMIZE, 0); });
 		MainWindow->GetPanel()->Add(min);
 
+		static bool isLightTheme = false;
+		static std::shared_ptr<VinaButton> themeBtn = std::make_shared<VinaButton>();
+		themeBtn->Set(rc.right / gScale - 220, 10, 100, 28, isLightTheme ? L"Dark" : L"Light", [&]() {
+			isLightTheme = !isLightTheme;
+			if (isLightTheme) MainWindow->SetThemeLight();
+			else MainWindow->SetThemeDark();
+			themeBtn->SetInfo(themeBtn->GetCurrentRect(), isLightTheme ? L"Dark" : L"Light");
+			});
+		MainWindow->GetPanel()->Add(themeBtn);
+
 
 
 		ctx->InitTabs();

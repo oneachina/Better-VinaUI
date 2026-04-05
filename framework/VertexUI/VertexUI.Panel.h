@@ -217,6 +217,24 @@ namespace VertexUI
 	VertexUIPos SharedPos;
 	namespace Panel
 	{
+		struct ThemePalette
+		{
+			unsigned long background = RGB(42, 47, 56);
+			unsigned long surface = RGB(52, 57, 66);
+			unsigned long surfacePlus = RGB(72, 77, 86);
+			unsigned long textPrimary = RGB(244, 244, 244);
+			unsigned long accent = RGB(82, 121, 251);
+			unsigned long warning = RGB(222, 119, 64);
+			unsigned long success = RGB(38, 212, 110);
+			unsigned long danger = RGB(255, 115, 119);
+		};
+		void SetThemeDark();
+		void SetThemeLight();
+		void SetThemeCustom(const ThemePalette& palette);
+		const ThemePalette& GetCurrentThemePalette();
+		const wchar_t* GetCurrentThemeName();
+		unsigned long ApplyThemeColor(unsigned long color);
+
 		const wchar_t* GetDefaultUIFontFamily();
 		const wchar_t* GetDefaultUIIconFontFamily();
 		void SetDefaultUIFontFamily(const wchar_t* fontFamily);
@@ -273,7 +291,8 @@ namespace VertexUI
 		}
 		unsigned long RGBToHex(unsigned long OriClr)
 		{
-			return GetRValue(OriClr) << 16 | GetGValue(OriClr) << 8 | GetBValue(OriClr);
+			unsigned long themed = ApplyThemeColor(OriClr);
+			return GetRValue(themed) << 16 | GetGValue(themed) << 8 | GetBValue(themed);
 		}
 
 
@@ -2403,6 +2422,94 @@ namespace VertexUI
 
 namespace VertexUI::Panel
 {
+	// Theme manager: built-in dark/light and runtime custom palette.
+	inline ThemePalette BuildDarkThemePalette()
+	{
+		ThemePalette p;
+		p.background = RGB(42, 47, 56);
+		p.surface = RGB(52, 57, 66);
+		p.surfacePlus = RGB(72, 77, 86);
+		p.textPrimary = RGB(244, 244, 244);
+		p.accent = RGB(82, 121, 251);
+		p.warning = RGB(222, 119, 64);
+		p.success = RGB(38, 212, 110);
+		p.danger = RGB(255, 115, 119);
+		return p;
+	}
+	inline ThemePalette BuildLightThemePalette()
+	{
+		ThemePalette p;
+		p.background = RGB(244, 244, 244);
+		p.surface = RGB(252, 252, 252);
+		p.surfacePlus = RGB(228, 232, 238);
+		p.textPrimary = RGB(24, 24, 24);
+		p.accent = RGB(45, 137, 239);
+		p.warning = RGB(209, 111, 58);
+		p.success = RGB(27, 160, 95);
+		p.danger = RGB(210, 82, 90);
+		return p;
+	}
+	inline ThemePalette& GetCurrentThemePaletteStorage()
+	{
+		static ThemePalette s_palette = BuildDarkThemePalette();
+		return s_palette;
+	}
+	inline std::wstring& GetCurrentThemeNameStorage()
+	{
+		static std::wstring s_name = L"dark";
+		return s_name;
+	}
+	inline void ApplyThemePaletteToColorSystem(const ThemePalette& p)
+	{
+		vuicolor.bg_r = GetRValue(p.background);
+		vuicolor.bg_g = GetGValue(p.background);
+		vuicolor.bg_b = GetBValue(p.background);
+		VuiColorSystemInit();
+		vuicolor.bg_d1_r = GetRValue(p.surface);
+		vuicolor.bg_d1_g = GetGValue(p.surface);
+		vuicolor.bg_d1_b = GetBValue(p.surface);
+		vuicolor.bg_d2_r = GetRValue(p.surfacePlus);
+		vuicolor.bg_d2_g = GetGValue(p.surfacePlus);
+		vuicolor.bg_d2_b = GetBValue(p.surfacePlus);
+		vuicolor.txt_r = GetRValue(p.textPrimary);
+		vuicolor.txt_g = GetGValue(p.textPrimary);
+		vuicolor.txt_b = GetBValue(p.textPrimary);
+	}
+	inline void SetThemeDark()
+	{
+		GetCurrentThemePaletteStorage() = BuildDarkThemePalette();
+		GetCurrentThemeNameStorage() = L"dark";
+		ApplyThemePaletteToColorSystem(GetCurrentThemePaletteStorage());
+	}
+	inline void SetThemeLight()
+	{
+		GetCurrentThemePaletteStorage() = BuildLightThemePalette();
+		GetCurrentThemeNameStorage() = L"light";
+		ApplyThemePaletteToColorSystem(GetCurrentThemePaletteStorage());
+	}
+	inline void SetThemeCustom(const ThemePalette& palette)
+	{
+		GetCurrentThemePaletteStorage() = palette;
+		GetCurrentThemeNameStorage() = L"custom";
+		ApplyThemePaletteToColorSystem(GetCurrentThemePaletteStorage());
+	}
+	inline const ThemePalette& GetCurrentThemePalette()
+	{
+		return GetCurrentThemePaletteStorage();
+	}
+	inline const wchar_t* GetCurrentThemeName()
+	{
+		return GetCurrentThemeNameStorage().c_str();
+	}
+	inline unsigned long ApplyThemeColor(unsigned long color)
+	{
+		const ThemePalette& t = GetCurrentThemePaletteStorage();
+		if (color == RGB(82, 121, 251) || color == RGB(15, 107, 209)) return t.accent;
+		if (color == RGB(222, 119, 64)) return t.warning;
+		if (color == RGB(38, 212, 110) || color == RGB(26, 188, 156)) return t.success;
+		if (color == RGB(255, 115, 119) || color == RGB(232, 77, 61)) return t.danger;
+		return color;
+	}
 	// Global font configuration and runtime registration API.
 	inline std::wstring& GetDefaultUIFontStorage()
 	{
