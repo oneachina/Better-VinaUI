@@ -1,4 +1,5 @@
 #include "VinaApp.h"
+#include <chrono>
 
 struct WaterfallCard {
 	float y;
@@ -12,7 +13,8 @@ struct WaterfallCard {
 class MainAppContext {
 public:
 	int currentTabIndex = 0;
-	float scrollVal=0;
+	float scrollVal = 0.0f;
+	float scrollTarget = 0.0f;
 	std::vector<std::shared_ptr<VinaSideTab>> tabs;
 	std::shared_ptr<VinaButton> btn = std::make_shared<VinaButton>();
 	std::shared_ptr<VinaSlider> sli = std::make_shared<VinaSlider>();
@@ -31,6 +33,7 @@ public:
 	float maxScrollLimit = 0.0f; 
 	bool isGenerating = false; 
 	int activeAnimationCount = 0;
+	double lastLoadTimeSec = 0.0;
 
 	void InitTabs() {
 		if (!tabs.empty()) return;
@@ -67,6 +70,7 @@ public:
 
 	void ResetWaterfallAnimationState() {
 		activeAnimationCount = 0;
+		scrollTarget = scrollVal;
 		for (auto& card : waterfallData) {
 			if (card.animated && (card.alpha < 1.0f || card.animY > 0.0f)) {
 				card.alpha = 1.0f;
@@ -117,9 +121,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	MainWindow->Set(100, 100, 720 * gScale, 480 * gScale, L"Vina.Class.App.Main.Test", L"Vilinko VinaUI");
 
 	MainWindow->CreatePanel([ctx](HWND hWnd, ID2D1HwndRenderTarget* hrt)->void {
+		auto nowSec = []() -> double {
+			using namespace std::chrono;
+			return duration<double>(steady_clock::now().time_since_epoch()).count();
+		};
 
 		RECT rc;
 		GetClientRect(hWnd, &rc);
+		const float viewWidth = rc.right / gScale;
+		const float viewHeight = rc.bottom / gScale;
 		D2DDrawSolidRect(hrt, 0, 0, rc.right, rc.bottom, VERTEXUICOLOR_DARKNIGHT);
 		MainWindow->GetPanel()->Set(hWnd, hrt);
 
@@ -133,19 +143,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 		if (ctx->currentTabIndex == 0) {
+			const float marginX = 36.0f;
+			const float contentTop = 112.0f;
+			const float colGap = 28.0f;
+			const float leftW = std::max(180.0f, std::min(260.0f, viewWidth * 0.32f));
+			const float rightX = marginX + leftW + colGap;
+			const float rightW = std::max(220.0f, viewWidth - rightX - marginX);
 
-			ctx->btn->Set(40, 120, 140, 60, L"Button", [] {return 0; });
+			ctx->btn->Set((int)marginX, (int)contentTop, (int)leftW, 44, L"Button", [] {return 0; });
 			MainWindow->GetPanel()->Add(ctx->btn);
 
-			ctx->sli->Set(40, 200, 140, 30, -1, VERTEXUICOLOR_DARKEN, L"Slider", [] {});
+			ctx->sli->Set((int)marginX, (int)(contentTop + 62), (int)leftW, 34, -1, VERTEXUICOLOR_DARKEN, L"Slider", [] {});
 			MainWindow->GetPanel()->Add(ctx->sli);
 
-			ctx->sw->Set(40, 255, 60, 30, { VERTEXUICOLOR_DARKEN }, [] {});
+			ctx->sw->Set((int)marginX, (int)(contentTop + 112), 72, 34, { VERTEXUICOLOR_DARKEN }, [] {});
 			MainWindow->GetPanel()->Add(ctx->sw);
 
 			if (ctx->sw->GetValue())
 			{
-				ctx->fi->Set(40, 300, 260, 160);
+				const float fiH = std::max(130.0f, viewHeight - (contentTop + 170.0f) - 36.0f);
+				ctx->fi->Set((int)marginX, (int)(contentTop + 162), (int)leftW, (int)fiH);
 				ctx->fi->SetFileOpenCallback([](std::wstring path)->void {
 					MessageBox(0, path.c_str(), L"Current", 0);
 					});
@@ -153,15 +170,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				MainWindow->GetPanel()->Add(ctx->fi);
 			}
 
-			ctx->mt->Set(260, 120, 300, 100, L"This is a test string.\nAnd this is a multi line text area.\ne.g:\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
+			const float mtH = std::max(130.0f, viewHeight * 0.30f);
+			ctx->mt->Set((int)rightX, (int)contentTop, (int)rightW, (int)mtH, L"This is a test string.\nAnd this is a multi line text area.\ne.g:\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
 			ctx->mt->SetParent(MainWindow->GetPanel());
 			MainWindow->GetPanel()->Add(ctx->mt);
 
 			if (ctx->edt->cx == 0)/*这里为了演示方便，做简单的初始化。实际使用建议将Set移动到外层。*/
 			{
-				ctx->edt->Set(260, 240, 300, 30, L"This is a Edit...");
+				ctx->edt->Set((int)rightX, (int)(contentTop + mtH + 18), (int)rightW, 34, L"This is a Edit...");
 			}
-			ctx->edt->Set2(260, 240, 300, 35, VERTEXUICOLOR_MIDNIGHT, VERTEXUICOLOR_WHITE);
+			ctx->edt->Set2((int)rightX, (int)(contentTop + mtH + 18), (int)rightW, 36, VERTEXUICOLOR_MIDNIGHT, VERTEXUICOLOR_WHITE);
 			MainWindow->GetPanel()->Add(ctx->edt);
 
 			/*
@@ -223,8 +241,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				return false;
 				});
 
-			float startX_txt = 260.0f;
-			float startY_txt = 290.0f;
+			float startX_txt = rightX;
+			float startY_txt = contentTop + mtH + 70.0f;
 
 			for (auto& item : ctx->animatingChars) {
 				D2DDrawText2(hrt, std::wstring(1, item.ch).c_str(),
@@ -236,11 +254,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (ctx->currentTabIndex == 1)
 		{
 			float delta = MainWindow->GetPanel()->GetInstantScrollDepth();
-			ctx->scrollVal -= delta;
-			if (ctx->scrollVal > 0.0f) ctx->scrollVal = 0.0f;
+			ctx->scrollTarget -= delta;
+			if (ctx->scrollTarget > 0.0f) ctx->scrollTarget = 0.0f;
 
-			float viewWidth = rc.right / gScale;
-			float viewHeight = rc.bottom / gScale;
+			if (ctx->waterfallData.empty()) {
+				ctx->GenerateCards(16);
+			}
+
 			float cardW = (viewWidth - 60.0f) / 2.0f;
 			float cardH = 150.0f;
 			float spacing = 20.0f;
@@ -251,11 +271,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			float minScroll = viewHeight - totalContentHeight - 50.0f;
 			if (minScroll > 0) minScroll = 0;
-			if (ctx->scrollVal < minScroll) ctx->scrollVal = minScroll;
+			if (ctx->scrollTarget < minScroll) ctx->scrollTarget = minScroll;
+			ctx->scrollVal += (ctx->scrollTarget - ctx->scrollVal) * 0.18f;
+			if (fabs(ctx->scrollTarget - ctx->scrollVal) < 0.2f) ctx->scrollVal = ctx->scrollTarget;
 
 			// 触发加载
-			if (totalContentHeight + ctx->scrollVal < viewHeight + 100.0f && ctx->waterfallData.size() < 200) {
+			double t = nowSec();
+			if (totalContentHeight + ctx->scrollVal < viewHeight + 100.0f
+				&& ctx->waterfallData.size() < 200
+				&& (t - ctx->lastLoadTimeSec) > 0.22) {
 				ctx->GenerateCards(6);
+				ctx->lastLoadTimeSec = t;
 			}
 
 			
@@ -274,32 +300,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				
 				if (!card.animated) {
 					// 渲染排队
-					if (ctx->activeAnimationCount < 2) {
+					if (ctx->activeAnimationCount < 4) {
 						card.animated = true;
 						ctx->activeAnimationCount++;
+						const size_t cardIndex = i;
 
 						MainWindow->AnimateVariableWithBezier(hWnd, card.alpha, 0.0f, 1.0f, 0.5);
 						MainWindow->AnimateVariableWithBezier(hWnd, card.animY, 30.0f, 0.0f, 0.6,
 							0.25, 0.1, 0.25, 1.0,
-							[ctx, &card] {
-								card.animY = 0.0f;
-								card.alpha = 1.0f;
+							[ctx, cardIndex] {
+								if (cardIndex < ctx->waterfallData.size()) {
+									ctx->waterfallData[cardIndex].animY = 0.0f;
+									ctx->waterfallData[cardIndex].alpha = 1.0f;
+								}
 								if (ctx->activeAnimationCount > 0) ctx->activeAnimationCount--;
 							}
 						);
-					}
-				}
-				else {
-			    // 同步动画位置
-					if (card.alpha > 0.0f && card.alpha < 1.0f) {
-						card.alpha += 0.08f;
-						card.animY -= 2.4f; 
-						if (card.alpha >= 1.0f) {
-							card.alpha = 1.0f;
-							card.animY = 0.0f;
-							
-							if (ctx->activeAnimationCount > 0) ctx->activeAnimationCount--;
-						}
 					}
 				}
 
