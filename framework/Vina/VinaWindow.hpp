@@ -134,35 +134,32 @@ public:
 	void UpdateAnimations() {
 		double currentTime = NowSeconds();
 
-		std::vector<std::function<void()>> completeCallbacks;
 		std::unordered_set<HWND> windowsToRefresh;
 
-		for (auto& task : tasks) {
-			if (!task.isActive) continue;
+		// Use index-based iteration to avoid reference invalidation if callbacks append animations.
+		for (size_t i = 0; i < tasks.size(); ++i) {
+			if (i >= tasks.size()) break;
+			if (!tasks[i].isActive) continue;
 
-			double elapsed = currentTime - task.startTime;
-			double progress = task.duration <= 0.0 ? 1.0 : std::min(elapsed / task.duration, 1.0);
+			const double elapsed = currentTime - tasks[i].startTime;
+			const double progress = tasks[i].duration <= 0.0 ? 1.0 : std::min(elapsed / tasks[i].duration, 1.0);
+			const HWND targetHwnd = tasks[i].targetHwnd;
+			auto progressFunc = tasks[i].progressFunc;
+			auto updateFunc = tasks[i].updateFunc;
 
-			if (task.progressFunc && task.updateFunc) {
-				double currentProgress = task.progressFunc(progress);
-				task.updateFunc(currentProgress);
+			if (progressFunc && updateFunc) {
+				const double currentProgress = progressFunc(progress);
+				updateFunc(currentProgress);
 			}
-			if (task.targetHwnd && IsWindow(task.targetHwnd)) {
-				windowsToRefresh.insert(task.targetHwnd);
+			if (targetHwnd && IsWindow(targetHwnd)) {
+				windowsToRefresh.insert(targetHwnd);
 			}
-			if (elapsed >= task.duration) {
-				task.isActive = false; 
-				if (task.completeFunc) {
-					completeCallbacks.push_back(task.completeFunc);
-				}
+			if (elapsed >= tasks[i].duration) {
+				tasks[i].isActive = false;
 			}
 		}
 
 		Cleanup();
-
-		for (const auto& complete : completeCallbacks) {
-			complete();
-		}
 		for (HWND hwnd : windowsToRefresh) {
 			if (hwnd && IsWindow(hwnd)) {
 				Refresh(hwnd);
