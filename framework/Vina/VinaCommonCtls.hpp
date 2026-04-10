@@ -2272,24 +2272,24 @@ class VinaFAIcon : public VertexUIControl {
 public:
 	std::wstring CvtFont(std::wstring from)
 	{
-		if (from == std::wstring(L"test-right"))return std::wstring(L"\uf178");
-		if (from == std::wstring(L"test-right-upd"))return std::wstring(L"\uf178");
-		if (from == std::wstring(L"test-right-dld"))return std::wstring(L"\uf178");
-		if (from == std::wstring(L"win-close"))return std::wstring(L"\uf00d");
-		if (from == std::wstring(L"win-max"))return std::wstring(L"\uf065");
-		if (from == std::wstring(L"win-winmax"))return std::wstring(L"\uf424");
-		if (from == std::wstring(L"win-winrestore"))return std::wstring(L"\uf422");
-		if (from == std::wstring(L"win-min"))return std::wstring(L"\uf068");
-		if (from == std::wstring(L"win-restore"))return std::wstring(L"\uf066");
-		if (from == std::wstring(L"test-complete"))return std::wstring(L"\uf00C");
-		if (from == std::wstring(L"test-left"))return std::wstring(L"\uf177");
-		if (from == std::wstring(L"test-more"))return std::wstring(L"\uf141");
-		if (from == std::wstring(L"test-more2"))return std::wstring(L"\uf52c");
-		if (from == std::wstring(L"test-more3"))return std::wstring(L"\uf142");
-		if (from == std::wstring(L"win-fold"))return std::wstring(L"\uf077");
-		if (from == std::wstring(L"win-extend"))return std::wstring(L"\u2304");
-		if (from == std::wstring(L"test-refresh"))return std::wstring(L"\uf0E2");
-		if (from == std::wstring(L"test-plus"))return std::wstring(L"\uf067");
+		if (from == std::wstring(L"test-right"))return std::wstring(L"→");
+		if (from == std::wstring(L"test-right-upd"))return std::wstring(L"→");
+		if (from == std::wstring(L"test-right-dld"))return std::wstring(L"→");
+		if (from == std::wstring(L"win-close"))return std::wstring(L"✕");
+		if (from == std::wstring(L"win-max"))return std::wstring(L"□");
+		if (from == std::wstring(L"win-winmax"))return std::wstring(L"□");
+		if (from == std::wstring(L"win-winrestore"))return std::wstring(L"❐");
+		if (from == std::wstring(L"win-min"))return std::wstring(L"—");
+		if (from == std::wstring(L"win-restore"))return std::wstring(L"❐");
+		if (from == std::wstring(L"test-complete"))return std::wstring(L"✓");
+		if (from == std::wstring(L"test-left"))return std::wstring(L"←");
+		if (from == std::wstring(L"test-more"))return std::wstring(L"⋯");
+		if (from == std::wstring(L"test-more2"))return std::wstring(L"⋯");
+		if (from == std::wstring(L"test-more3"))return std::wstring(L"⋯");
+		if (from == std::wstring(L"win-fold"))return std::wstring(L"⌃");
+		if (from == std::wstring(L"win-extend"))return std::wstring(L"⌄");
+		if (from == std::wstring(L"test-refresh"))return std::wstring(L"↻");
+		if (from == std::wstring(L"test-plus"))return std::wstring(L"+");
 		return from;
 	}
 	void Set(int x, int y, const wchar_t* txt, int TxtSize = 15, unsigned long TxtColor = VERTEXUICOLOR_WHITE, std::function<void()>events = [] {})

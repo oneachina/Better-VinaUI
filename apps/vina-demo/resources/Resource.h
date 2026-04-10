@@ -1,4 +1,4 @@
-﻿//{{NO_DEPENDENCIES}}
+//{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ 生成的包含文件。
 // 使用者 VinaApp.rc
 
@@ -13,7 +13,6 @@
 #define IDI_SMALL				108
 #define IDC_VINAAPP			109
 #define IDC_MYICON				2
-#define IDF_FONTAWESOME 111
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1
 #endif

@@ -34,6 +34,7 @@ public:
 	bool isGenerating = false; 
 	int activeAnimationCount = 0;
 	double lastLoadTimeSec = 0.0;
+	bool waterfallCapacityReserved = false;
 
 	void InitTabs() {
 		if (!tabs.empty()) return;
@@ -59,6 +60,10 @@ public:
 	}
 
 	void GenerateCards(int count) {
+		if (!waterfallCapacityReserved) {
+			waterfallData.reserve(256);
+			waterfallCapacityReserved = true;
+		}
 		unsigned long macaronColors[] = { VERTEXUICOLOR_SEA, VERTEXUICOLOR_BLOOMLAVENDER, VERTEXUICOLOR_DAWN, VERTEXUICOLOR_FOREST, VERTEXUICOLOR_SEA };
 		for (int i = 0; i < count; i++) {
 			WaterfallCard card;
@@ -104,17 +109,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// MainWindow->SetDefaultFontFamily(L"ui-body");
 	// MainWindow->AddFontFallback(L"Segoe UI Emoji");
 
-	auto fontData = AppResourceManager::LoadRawResource(hInstance, IDF_FONTAWESOME, L"BINARY");
-
-	if (!fontData.empty()) {
-		MainWindow->RegisterFontFromMemory(fontData.data(), (DWORD)fontData.size());
-	}
-
-	namespace fs = std::filesystem;
-	fs::path fontPath =  L"Font-AwesomeFree.ttf";
-
-	FreeAnyResource(IDF_FONTAWESOME, L"BINARY", fontPath.c_str());
-	MainWindow->RegisterFontFromFile(fontPath.c_str());
+	// Optional: developers can register custom icon fonts on demand.
+	// Example:
+	// MainWindow->RegisterFontFromFile(L"./fonts/YourIconFont.ttf");
+	// MainWindow->SetDefaultIconFontFamily(L"Your Icon Font Family");
 
 	auto ctx = std::make_shared<MainAppContext>();
 
@@ -191,64 +189,72 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			*/
 
 			std::wstring currentText = ctx->edt->GetText();
+			if (ctx->edt->GetFocusFlag()) {
+				if (currentText != ctx->lastText) {
+					if (currentText.length() > ctx->lastText.length()) {
 
-			if (currentText != ctx->lastText) {
-				if (currentText.length() > ctx->lastText.length()) {
+						for (size_t i = ctx->lastText.length(); i < currentText.length(); ++i) {
 
-					for (size_t i = ctx->lastText.length(); i < currentText.length(); ++i) {
+							float lockedX = VuiMeasureStringWidth(currentText.substr(0, i), 18);
 
-						float lockedX = VuiMeasureStringWidth(currentText.substr(0, i), 18);
+							ctx->animatingChars.push_back({ currentText[i], 0.0f, lockedX, 18.0f, false });
+							CharAnim& ref = ctx->animatingChars.back();
 
-						ctx->animatingChars.push_back({ currentText[i], 0.0f, lockedX, 18.0f, false });
-						CharAnim& ref = ctx->animatingChars.back();
-
-						ref.alphaAnimId = MainWindow->AnimateVariableWithBezier(hWnd, ref.alpha, 0.0f, 1.0f, 0.4);
-						ref.yOffsetAnimId = MainWindow->AnimateVariableWithBezier(hWnd, ref.yOffset, 18.0f, 0.0f, 0.4);
-					}
-				}
-				else if (currentText.length() < ctx->lastText.length()) {
-
-					size_t diff = ctx->lastText.length() - currentText.length();
-					for (size_t i = 0; i < diff; ++i) {
-
-						auto it = std::find_if(ctx->animatingChars.rbegin(), ctx->animatingChars.rend(),
-							[](const CharAnim& c) { return !c.isRemoving; });
-
-						if (it != ctx->animatingChars.rend()) {
-							it->isRemoving = true;
-							CharAnim& ref = *it;
-
-							ref.alphaAnimId = MainWindow->AnimateVariableWithBezier(hWnd, ref.alpha, ref.alpha, 0.0f, 0.3);
-							ref.yOffsetAnimId = MainWindow->AnimateVariableWithBezier(hWnd, ref.yOffset, ref.yOffset, 10.0f, 0.3);
+							ref.alpha = 1.0f;
+							ref.yOffset = 0.0f;
+							ref.alphaAnimId = -1;
+							ref.yOffsetAnimId = -1;
 						}
 					}
+					else if (currentText.length() < ctx->lastText.length()) {
+
+						size_t diff = ctx->lastText.length() - currentText.length();
+						for (size_t i = 0; i < diff; ++i) {
+
+							auto it = std::find_if(ctx->animatingChars.rbegin(), ctx->animatingChars.rend(),
+								[](const CharAnim& c) { return !c.isRemoving; });
+
+							if (it != ctx->animatingChars.rend()) {
+								it->isRemoving = true;
+								CharAnim& ref = *it;
+
+								ref.alpha = 0.0f;
+								ref.yOffset = 10.0f;
+								ref.alphaAnimId = -1;
+								ref.yOffsetAnimId = -1;
+							}
+						}
+					}
+					ctx->lastText = currentText;
 				}
-				ctx->lastText = currentText;
+
+				ctx->animatingChars.remove_if([&](const CharAnim& c) {
+					if (c.isRemoving && c.alpha <= 0.01f) {
+
+						if (c.alphaAnimId != -1) {
+							MainWindow->StopAnimation(c.alphaAnimId);
+						}
+						if (c.yOffsetAnimId != -1) {
+							MainWindow->StopAnimation(c.yOffsetAnimId);
+						}
+						return true;
+					}
+					return false;
+					});
+
+				float startX_txt = rightX;
+				float startY_txt = contentTop + mtH + 70.0f;
+
+				for (auto& item : ctx->animatingChars) {
+					D2DDrawText2(hrt, std::wstring(1, item.ch).c_str(),
+						startX_txt + item.xOffset, startY_txt + item.yOffset,
+						20, 20, 18,
+						VERTEXUICOLOR_WHITE, L"Segoe UI", item.alpha);
+				}
 			}
-
-			//清理
-			ctx->animatingChars.remove_if([&](const CharAnim& c) {
-				if (c.isRemoving && c.alpha <= 0.01f) {
-		
-					if (c.alphaAnimId != -1) {
-						MainWindow->StopAnimation(c.alphaAnimId);
-					}
-					if (c.yOffsetAnimId != -1) {
-						MainWindow->StopAnimation(c.yOffsetAnimId);
-					}
-					return true; 
-				}
-				return false;
-				});
-
-			float startX_txt = rightX;
-			float startY_txt = contentTop + mtH + 70.0f;
-
-			for (auto& item : ctx->animatingChars) {
-				D2DDrawText2(hrt, std::wstring(1, item.ch).c_str(),
-					startX_txt + item.xOffset, startY_txt + item.yOffset,
-					20, 20, 18,
-					VERTEXUICOLOR_WHITE, L"Segoe UI", item.alpha);
+			else {
+				ctx->animatingChars.clear();
+				ctx->lastText = currentText;
 			}
 		}
 		if (ctx->currentTabIndex == 1)
@@ -305,17 +311,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						ctx->activeAnimationCount++;
 						const size_t cardIndex = i;
 
-						MainWindow->AnimateVariableWithBezier(hWnd, card.alpha, 0.0f, 1.0f, 0.5);
-						MainWindow->AnimateVariableWithBezier(hWnd, card.animY, 30.0f, 0.0f, 0.6,
-							0.25, 0.1, 0.25, 1.0,
-							[ctx, cardIndex] {
-								if (cardIndex < ctx->waterfallData.size()) {
-									ctx->waterfallData[cardIndex].animY = 0.0f;
-									ctx->waterfallData[cardIndex].alpha = 1.0f;
-								}
-								if (ctx->activeAnimationCount > 0) ctx->activeAnimationCount--;
-							}
-						);
+						card.alpha = 1.0f;
+						card.animY = 0.0f;
+						if (ctx->activeAnimationCount > 0) ctx->activeAnimationCount--;
 					}
 				}
 

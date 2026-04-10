@@ -49,6 +49,39 @@ cmake -S . -B build -DBUILD_VUI_PARSER_CLI=ON
 cmake --build build --config Release
 ```
 
+## SDK Install
+
+Install VinaUI as a CMake package:
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+cmake --install build --config Release --prefix ./sdk-install
+```
+
+Installed package layout:
+
+- `sdk-install/include/` (VinaUI headers)
+- `sdk-install/share/vinaui/assets/` (icons/fonts)
+- `sdk-install/lib/cmake/VinaUI/` (CMake package files)
+
+Consume from an external project:
+
+```cmake
+find_package(VinaUI CONFIG REQUIRED PATHS "path/to/sdk-install/lib/cmake/VinaUI")
+target_link_libraries(your_app PRIVATE VinaUI::vina_sdk)
+```
+
+Icon font policy:
+
+- VinaUI default icons now use system-available symbols (no bundled FontAwesome required).
+- If your app needs a custom icon font, register it explicitly:
+
+```C++
+MainWindow->RegisterFontFromFile(L"./fonts/YourIconFont.ttf");
+MainWindow->SetDefaultIconFontFamily(L"Your Icon Font Family");
+```
+
 ## Quick Start
 
 ### 1. Create Main Window
@@ -126,4 +159,3 @@ MainWindow->AnimateVariableWithBezier(
 - @Haceau-Zoac (vui.parser)
 - @KitraMGP (spec suggestions)
 - Thanks to all VinaUI contributors.
-

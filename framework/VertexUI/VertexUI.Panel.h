@@ -2518,7 +2518,7 @@ namespace VertexUI::Panel
 	}
 	inline std::wstring& GetDefaultUIIconFontStorage()
 	{
-		static std::wstring s_iconFont = L"Font Awesome 6 Free Solid";
+		static std::wstring s_iconFont = L"Segoe UI Symbol";
 		return s_iconFont;
 	}
 	inline std::vector<HANDLE>& GetRegisteredMemFonts()
@@ -2546,7 +2546,7 @@ namespace VertexUI::Panel
 	inline std::vector<std::wstring>& GetUIIconFallbackStorage()
 	{
 		static std::vector<std::wstring> s_fallback = {
-			L"Font Awesome 6 Free Solid", L"Segoe Fluent Icons", L"Segoe MDL2 Assets"
+			L"Segoe UI Symbol", L"Segoe UI", L"Segoe Fluent Icons", L"Segoe MDL2 Assets"
 		};
 		return s_fallback;
 	}
