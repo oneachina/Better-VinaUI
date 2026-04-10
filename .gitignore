@@ -369,4 +369,5 @@ FodyWeavers.xsd
 Font-AwesomeFree.ttf
 build/
 build-*/
+sdk-install/
 CMakeUserPresets.json
